@@ -58,7 +58,7 @@ Tested on:
 - Copy files and folders
 
 
-## Client Screenshot ([Client](https://github.com/MertJSX/folder-host-client))
+## Client Screenshot ([Client](https://github.com/MertJSX/folderhost-client))
 
 <img src="https://github.com/user-attachments/assets/b123ce9f-c8cb-49b0-9c75-0d1d16dba001" width="700px">
 
