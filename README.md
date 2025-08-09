@@ -1,6 +1,6 @@
-# 📁 Folder Host
+# 📁 Folderhost
 
-## What is Folder Host?
+## What is Folderhost?
 It helps you to host your folder to your other friends or colleagues.
 
 [NodeJS](https://nodejs.org/en) is required!
