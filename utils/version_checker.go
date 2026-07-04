@@ -79,8 +79,17 @@ func checkForUpdates(currentVersion string) (bool, string) {
 		Timeout: 5 * time.Second,
 	}
 
-	resp, err := client.Get("https://api.folderhost.org/v1/folderhost/version-check")
+	req, err := http.NewRequest("GET", "https://api.folderhost.org/v1/folderhost/version-check", nil)
 	if err != nil {
+		return false, currentVersion
+	}
+	req.Header.Set("User-Agent", "FolderHost-Server/"+currentVersion)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		if IsDevelopment() {
+			fmt.Printf("\n[Debug] Version check failed (network error): %v\n", err)
+		}
 		return false, currentVersion
 	}
 	defer resp.Body.Close()
