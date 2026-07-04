@@ -3,10 +3,13 @@ package middleware
 import (
 	"crypto/subtle"
 	"encoding/hex"
+	"fmt"
 	"strings"
 	"time"
 
+	"github.com/MertJSX/folderhost/database/logs"
 	"github.com/MertJSX/folderhost/database/users"
+	"github.com/MertJSX/folderhost/types"
 	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/cache"
 	"github.com/MertJSX/folderhost/utils/config"
@@ -61,7 +64,6 @@ func CheckAuth(c *fiber.Ctx) error {
 			return c.Status(401).JSON(fiber.Map{"err": "invalid token"})
 		}
 
-		// TODO: this should be a opt in feature
 		if subtle.ConstantTimeCompare([]byte(tokenData.Ip), []byte(userIp)) != 1 || tokenData.UserAgent != userUserAgent {
 			cache.TokenFingerprint.Delete(token)
 			return c.Status(401).JSON(fiber.Map{"err": "invalid token"})
@@ -84,6 +86,12 @@ func CheckAuth(c *fiber.Ctx) error {
 	}
 
 	if unsuccessfullLoginCount > 5 {
+		logs.CreateLog(types.AuditLog{
+			Username:    reqUsername,
+			Action:      "Login failed",
+			Description: fmt.Sprintf("Someone failed to login 5 times!\n IP: %s\n User Agent: %s", c.IP(), c.Get("User-Agent")),
+		})
+
 		return c.Status(403).JSON(fiber.Map{"err": "Too many failed login attempts. Please try again after 5 minutes."})
 	}
 

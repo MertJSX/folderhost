@@ -216,7 +216,7 @@ const Logs: React.FC = () => {
                                 </div>
 
                                 <div className="col-span-6">
-                                    <div className="text-gray-300 text-sm break-words">
+                                    <div className="text-gray-300 whitespace-pre-wrap text-sm break-words">
                                         {log.description}
                                     </div>
                                 </div>
@@ -257,14 +257,14 @@ const Logs: React.FC = () => {
                                 Load More Logs
                             </button>
                         </div>
-                    ) : filteredLogs.length < 0 && 
+                    ) : filteredLogs.length < 0 &&
                     (<div className="flex justify-center mt-4">
-                            <button
-                                disabled
-                                className="flex items-center gap-2 text-white font-semibold py-2 px-6 rounded transition-colors"
-                            >
-                                No more items to load
-                            </button>
+                        <button
+                            disabled
+                            className="flex items-center gap-2 text-white font-semibold py-2 px-6 rounded transition-colors"
+                        >
+                            No more items to load
+                        </button>
                     </div>)}
                 </section>
             </main>

@@ -19,12 +19,6 @@ func VerifyPassword(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"err": "unknown error while getting token"})
 	}
 
-	logs.CreateLog(types.AuditLog{
-		Username:    c.Locals("account").(types.Account).Username,
-		Action:      "Login",
-		Description: fmt.Sprintf("%s logged in to his account.", c.Locals("account").(types.Account).Username),
-	})
-
 	userIp := c.IP()
 	userUserAgent := c.Get("User-Agent")
 
@@ -32,6 +26,12 @@ func VerifyPassword(c *fiber.Ctx) error {
 		Ip:        userIp,
 		UserAgent: userUserAgent,
 	}, 24*time.Hour)
+
+	logs.CreateLog(types.AuditLog{
+		Username:    c.Locals("account").(types.Account).Username,
+		Action:      "Login",
+		Description: fmt.Sprintf("IP: %s\nUser Agent: %s", userIp, userUserAgent),
+	})
 
 	return c.JSON(
 		fiber.Map{
