@@ -1,7 +1,10 @@
 services:
   folderhost:
     container_name: folderhost-server
-    build: .
+    build:
+      context: .
+      args:
+        VERSION: ${VERSION:-unknown}
     ports:
       - "5000:5000"
     volumes:

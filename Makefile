@@ -4,9 +4,9 @@ start:
 web:
 	cd web && npm run dev
 
-docker:
-	docker compose build
-	docker compose up
+docker: # Example: make docker VERSION=v26.5.0
+	VERSION=$(VERSION) docker compose build
+	VERSION=$(VERSION) docker compose up
 
 test-server:
 	go run gotest.tools/gotestsum@latest --format testname ./test/

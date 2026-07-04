@@ -14,7 +14,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=frontend-builder /build/dist ./web/dist
-RUN CGO_ENABLED=1 go build -o folderhost -ldflags="-s -w" main.go
+ARG VERSION=unknown
+RUN CGO_ENABLED=1 go build -o folderhost -ldflags="-s -w -X main.Version=${VERSION}" main.go
 
 
 FROM alpine:latest
