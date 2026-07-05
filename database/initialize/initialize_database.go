@@ -37,10 +37,19 @@ func InitializeDatabase() {
 		database.CreateUsersTable()
 		database.CreateLogsTable()
 		database.CreateRecoveryTable()
+		database.CreateSharedTable()
 		err = users.CreateUser(&config.Config.AdminAccount)
 
 		if err != nil {
 			fmt.Println("Error creating Admin account.")
+		}
+	} else {
+		var tableName string
+		err := database.DB.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='shared';").Scan(&tableName)
+		if err == sql.ErrNoRows {
+			database.CreateSharedTable()
+		} else if err != nil {
+			fmt.Println("Error checking for shared table:", err)
 		}
 	}
 

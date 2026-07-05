@@ -91,3 +91,32 @@ func CreateRecoveryTable() {
 	fmt.Println("Recovery table has been created!")
 
 }
+
+func CreateSharedTable() {
+	_, err := DB.Exec(`
+		CREATE TABLE IF NOT EXISTS shared (
+			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			username TEXT NOT NULL,
+			userID INTEGER NOT NULL,
+			path TEXT NOT NULL,
+			password TEXT NULL,
+			downloadLimit INTEGER NOT NULL DEFAULT 0,
+			downloadCount INTEGER NOT NULL DEFAULT 0,
+			public BOOLEAN DEFAULT TRUE,
+        	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (username) REFERENCES users(username) 
+                ON DELETE CASCADE 
+                ON UPDATE CASCADE,
+			FOREIGN KEY (userID) REFERENCES users(id)
+				ON DELETE CASCADE
+				ON UPDATE CASCADE
+		);
+	`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Shared table has been created!")
+
+}
