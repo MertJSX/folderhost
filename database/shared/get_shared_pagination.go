@@ -22,12 +22,12 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 
 	if userID > 0 {
 		rows, err = database.DB.Query(
-			"SELECT id, username, userID, path, password, downloadLimit, downloadCount, public, created_at FROM shared WHERE userID=? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+			"SELECT id, username, userID, displayName, path, password, downloadLimit, downloadCount, public, created_at FROM shared WHERE userID=? ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			userID, limit, offset,
 		)
 	} else {
 		rows, err = database.DB.Query(
-			"SELECT id, username, userID, path, password, downloadLimit, downloadCount, public, created_at FROM shared ORDER BY created_at DESC LIMIT ? OFFSET ?",
+			"SELECT id, username, userID, displayName, path, password, downloadLimit, downloadCount, public, created_at FROM shared ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			limit, offset,
 		)
 	}
@@ -48,6 +48,7 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 			&record.ID,
 			&record.Username,
 			&record.UserID,
+			&record.DisplayName,
 			&record.Path,
 			&password,
 			&record.DownloadLimit,

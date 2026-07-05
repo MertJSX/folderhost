@@ -1,9 +1,10 @@
 package types
 
 type Shared struct {
-	ID            int    `json:"id"`
+	ID            string `json:"id"`
 	Username      string `json:"username"`
 	UserID        int    `json:"userID"`
+	DisplayName   string `json:"displayName"`
 	Path          string `json:"path"`
 	Password      string `json:"password"`
 	DownloadLimit int    `json:"downloadLimit"`

@@ -95,9 +95,10 @@ func CreateRecoveryTable() {
 func CreateSharedTable() {
 	_, err := DB.Exec(`
 		CREATE TABLE IF NOT EXISTS shared (
-			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+			id TEXT NOT NULL PRIMARY KEY,
 			username TEXT NOT NULL,
 			userID INTEGER NOT NULL,
+			displayName TEXT NOT NULL,
 			path TEXT NOT NULL,
 			password TEXT NULL,
 			downloadLimit INTEGER NOT NULL DEFAULT 0,

@@ -7,7 +7,7 @@ import (
 	"github.com/MertJSX/folderhost/database"
 )
 
-func DeleteShared(id int) error {
+func DeleteShared(id string) error {
 	tx, err := database.DB.Begin()
 	if err != nil {
 		log.Fatal(err)
