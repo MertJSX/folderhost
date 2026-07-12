@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"embed"
 	"fmt"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"strings"
 	"syscall"
 
+	"github.com/MertJSX/folderhost/database"
 	"github.com/MertJSX/folderhost/database/initialize"
 	"github.com/MertJSX/folderhost/middleware"
 	fhWS "github.com/MertJSX/folderhost/middleware/websocket"
@@ -110,6 +112,11 @@ func main() {
 		}
 
 		log.Println("Stopping program...")
+		
+		if database.DB != nil {
+			database.DB.Close()
+		}
+
 		os.Exit(0)
 	}()
 
@@ -133,6 +140,9 @@ func main() {
 	app.Get("/ws/:path", websocket.New(fhWS.HandleWebsocket))
 
 	app.Get("/download", routes.Download)
+
+	app.Get("/shared/:id", routes.GetSharedLink)
+	app.Post("/shared/:id/download", routes.PostSharedFileDownload)
 
 	app.Use("/api", middleware.CheckAuth)
 
@@ -180,6 +190,12 @@ func main() {
 
 	app.Put("/api/explorer/rename", routes.Rename)
 
+	app.Post("/api/shared", routes.PostCreateSharedFile)
+
+	app.Get("/api/shared/*", routes.GetSharedFile)
+
+	app.Delete("/api/shared/*", routes.DeleteSharedFile)
+
 	app.Get("/api/raw/:filepath", routes.RawFile)
 
 	app.Get("/api/recovery", routes.Recovery)
@@ -209,6 +225,25 @@ func main() {
 		if err != nil {
 			log.Fatal("Error creating sub FS:", err)
 		}
+
+		app.Get("/share/:id", func(c *fiber.Ctx) error {
+			id := c.Params("id")
+			indexFile, err := distFS.Open("index.html")
+			if err != nil {
+				return c.Status(404).SendString("Not Found")
+			}
+			defer indexFile.Close()
+
+			content, err := io.ReadAll(indexFile)
+			if err != nil {
+				return c.Status(500).SendString("Internal Server Error")
+			}
+
+			htmlStr := utils.InjectShareMetaTags(string(content), id, c.BaseURL())
+
+			c.Type("html")
+			return c.SendString(htmlStr)
+		})
 
 		app.Use("/", filesystem.New(filesystem.Config{
 			Root:         http.FS(distFS),

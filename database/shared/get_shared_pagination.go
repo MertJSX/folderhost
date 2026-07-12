@@ -22,12 +22,12 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 
 	if userID > 0 {
 		rows, err = database.DB.Query(
-			"SELECT id, username, userID, displayName, path, password, downloadLimit, downloadCount, public, created_at FROM shared WHERE userID=? ORDER BY created_at DESC LIMIT ? OFFSET ?",
+			"SELECT id, username, userID, displayName, path, password, expires_at, downloadCount, file_extension, created_at FROM shared WHERE userID=? ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			userID, limit, offset,
 		)
 	} else {
 		rows, err = database.DB.Query(
-			"SELECT id, username, userID, displayName, path, password, downloadLimit, downloadCount, public, created_at FROM shared ORDER BY created_at DESC LIMIT ? OFFSET ?",
+			"SELECT id, username, userID, displayName, path, password, expires_at, downloadCount, file_extension, created_at FROM shared ORDER BY created_at DESC LIMIT ? OFFSET ?",
 			limit, offset,
 		)
 	}
@@ -42,6 +42,8 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 	for rows.Next() {
 		var record types.Shared
 		var password sql.NullString
+		var expiresAt sql.NullString
+		var fileExtension sql.NullString
 		var createdAt sql.NullString
 
 		err := rows.Scan(
@@ -51,9 +53,9 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 			&record.DisplayName,
 			&record.Path,
 			&password,
-			&record.DownloadLimit,
+			&expiresAt,
 			&record.DownloadCount,
-			&record.Public,
+			&fileExtension,
 			&createdAt,
 		)
 
@@ -64,8 +66,14 @@ func GetSharedPagination(page int, limit int, userID int) ([]types.Shared, error
 		if password.Valid {
 			record.Password = password.String
 		}
+		if expiresAt.Valid {
+			record.ExpiresAt = expiresAt.String
+		}
 		if createdAt.Valid {
 			record.CreatedAt = createdAt.String
+		}
+		if fileExtension.Valid {
+			record.FileExtension = fileExtension.String
 		}
 
 		records = append(records, record)

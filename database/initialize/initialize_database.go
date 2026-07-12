@@ -17,7 +17,7 @@ func InitializeDatabase() {
 	if utils.IsNotExistingPath("./database.db") {
 		firstTime = true
 	}
-	database.DB, err = sql.Open("sqlite", "./database.db")
+	database.DB, err = sql.Open("sqlite", "./database.db?_pragma=busy_timeout(5000)")
 
 	if err != nil {
 		log.Fatal(err)
@@ -28,7 +28,9 @@ func InitializeDatabase() {
 		log.Fatal(err)
 	}
 
-	_, err = database.DB.Exec("PRAGMA foreign_keys = ON;")
+	database.DB.SetMaxOpenConns(1)
+	
+	_, err = database.DB.Exec("PRAGMA busy_timeout = 5000; PRAGMA foreign_keys = ON;")
 	if err != nil {
 		log.Fatal(err)
 	}

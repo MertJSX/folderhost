@@ -8,8 +8,8 @@ import (
 	"github.com/MertJSX/folderhost/types"
 )
 
-func GetSharedByID(id string) (*types.Shared, error) {
-	row := database.DB.QueryRow("SELECT id, username, userID, displayName, path, password, expires_at, downloadCount, file_extension, created_at FROM shared WHERE id=?", id)
+func GetSharedByPath(userID int, path string) (*types.Shared, error) {
+	row := database.DB.QueryRow("SELECT id, username, userID, displayName, path, password, expires_at, downloadCount, file_extension, created_at FROM shared WHERE userID=? AND path=?", userID, path)
 
 	var record types.Shared
 	var password sql.NullString

@@ -7,8 +7,8 @@ type Shared struct {
 	DisplayName   string `json:"displayName"`
 	Path          string `json:"path"`
 	Password      string `json:"password"`
-	DownloadLimit int    `json:"downloadLimit"`
+	ExpiresAt     string `json:"expires_at"`
 	DownloadCount int    `json:"downloadCount"`
-	Public        bool   `json:"public"`
+	FileExtension string `json:"fileExtension"`
 	CreatedAt     string `json:"created_at"`
 }

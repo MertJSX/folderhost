@@ -101,9 +101,9 @@ func CreateSharedTable() {
 			displayName TEXT NOT NULL,
 			path TEXT NOT NULL,
 			password TEXT NULL,
-			downloadLimit INTEGER NOT NULL DEFAULT 0,
+			expires_at DATETIME NULL,
 			downloadCount INTEGER NOT NULL DEFAULT 0,
-			public BOOLEAN DEFAULT TRUE,
+			file_extension TEXT NULL,
         	created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			FOREIGN KEY (username) REFERENCES users(username) 
                 ON DELETE CASCADE 
