@@ -26,7 +26,8 @@ const ItemInfo = () => {
     directoryInfo,
     zipProgress,
     startZipping,
-    setShowUploadMenu
+    setShowUploadMenu,
+    setShowShareModal
   } = useContext<ExplorerContextType>(ExplorerContext)
 
   const [imageData, setImageData] = useState("")
@@ -269,6 +270,13 @@ const ItemInfo = () => {
                   >Open in Code Editor</button> : null
 
             }
+            <button
+              className='bg-sky-500 px-6 font-bold rounded-xl'
+              title='Click to share file.'
+              onClick={() => {
+                setShowShareModal(true)
+              }}
+            >Share</button>
           </div>
         ) :
           <div className="flex flex-col gap-2 w-5/6">
@@ -335,7 +343,7 @@ const ItemInfo = () => {
                       <button
                         className='bg-purple-600 px-6 font-bold rounded-xl text-center'
                         title='Click to upload.'
-                        onClick={() => {setShowUploadMenu(true)}}
+                        onClick={() => { setShowUploadMenu(true) }}
                       >Upload</button> : showDisabled === true ?
                         <button
                           className='bg-purple-600 px-6 font-bold rounded-xl text-center opacity-50 cursor-not-allowed'

@@ -56,4 +56,6 @@ export interface ExplorerContextType {
         bulkCopy: () => Promise<void>;
         bulkMove: (targetPath: string) => Promise<void>;
         isBulkActionLoading: boolean;
+        showShareModal: boolean;
+        setShowShareModal: React.Dispatch<React.SetStateAction<boolean>>;
 }

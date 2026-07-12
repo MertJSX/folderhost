@@ -18,6 +18,7 @@ import RenameDirectoryItem from '../../components/minimal/RenameDirectoryItem/Re
 import FileViewer from '../../components/FileViewer/FileViewer';
 import UploadItem from '../../components/UploadItem/UploadItem';
 import BulkActionBar from '../../components/BulkActionBar/BulkActionBar';
+import ShareFileComponent from '../../components/ShareFileComponent/ShareFileComponent';
 const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL;
 
 const ExplorerPage: React.FC = () => {
@@ -46,6 +47,7 @@ const ExplorerPage: React.FC = () => {
   const [showRenameItemMenu, setShowRenameItemMenu] = useState<boolean>(false);
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [showUploadMenu, setShowUploadMenu] = useState<boolean>(false);
+  const [showShareModal, setShowShareModal] = useState<boolean>(false);
   const [contextMenu, setContextMenu] = useState({
     show: false,
     x: 0,
@@ -609,7 +611,9 @@ const ExplorerPage: React.FC = () => {
     bulkDelete: bulkDelete,
     bulkCopy: bulkCopy,
     bulkMove: bulkMove,
-    isBulkActionLoading: isBulkActionLoading
+    isBulkActionLoading: isBulkActionLoading,
+    showShareModal: showShareModal,
+    setShowShareModal: setShowShareModal
   };
 
   return (
@@ -628,6 +632,7 @@ const ExplorerPage: React.FC = () => {
           <CreateDirectoryItem />
           <RenameDirectoryItem />
           {showUploadMenu && <UploadItem />}
+          <ShareFileComponent />
           <FileExplorer />
           {
             itemInfo && (

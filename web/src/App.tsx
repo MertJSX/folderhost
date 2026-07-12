@@ -17,6 +17,7 @@ const Services = lazy(() => import('./pages/Services/Services'));
 const ServiceManager = lazy(() => import('./pages/ServiceManager/ServiceManager'));
 const NewUser = lazy(() => import('./pages/NewUser/NewUser'));
 const EditUser = lazy(() => import('./pages/EditUser/EditUser'));
+const SharePage = lazy(() => import('./pages/SharePage/SharePage'));
 const Default = lazy(() => import('./components/templates/Default'));
 
 function App() {
@@ -78,6 +79,10 @@ function App() {
             <Route path="editor">
               <Route index element={<NoPage />} />
               <Route path=":path" element={<CodeEditor />} />
+            </Route>
+            <Route path="share">
+              <Route index element={<NoPage />} />
+              <Route path=":id" element={<SharePage />} />
             </Route>
             <Route path="*" element={<NoPage />} />
           </Route>

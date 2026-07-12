@@ -19,6 +19,10 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, ''),
         },
+        '/shared': {
+          target: env.VITE_API_BASE_URL || 'http://localhost:5000',
+          changeOrigin: true,
+        },
       },
     } : undefined,
   };
