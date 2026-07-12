@@ -19,6 +19,7 @@ func CreateLog(logItem types.AuditLog) error {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
+	defer tx.Rollback()
 
 	logItem.Description = normalizeSlashes(logItem.Description)
 
