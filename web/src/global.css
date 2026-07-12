@@ -21,11 +21,20 @@ body {
 @layer utilities {
   .terminal {
     font-family: JetBrains Mono, Fira Code, Cascadia Code, monospace;
+
     * {
       font-family: JetBrains Mono, Fira Code, Cascadia Code, monospace;
     }
   }
 
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s;
+  -webkit-text-fill-color: white !important;
 }
 
 ::selection {
