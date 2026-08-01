@@ -43,7 +43,8 @@ const ShareFileComponent = () => {
         }
 
         try {
-            const fullPath = (path === "./") ? itemInfo.name : `${path}${itemInfo.name}`
+            const rawPath = path === "./" ? itemInfo.name : `${path}/${itemInfo.name}`
+            const fullPath = rawPath.replace(/^\.\//, "").replace(/\/+/g, "/")
             const response = await axiosInstance.get<Shared>(`/shared/${fullPath}`)
             setShared(response.data)
             setSharedFile(true)
@@ -82,7 +83,8 @@ const ShareFileComponent = () => {
         }
 
         try {
-            const fullPath = (path === "./") ? itemInfo.name : `${path}${itemInfo.name}`
+            const rawPath = path === "./" ? itemInfo.name : `${path}/${itemInfo.name}`
+            const fullPath = rawPath.replace(/^\.\//, "").replace(/\/+/g, "/")
             const response = await axiosInstance.post<{ response: string, shared: Shared }>(`/shared`, {
                 shared: {
                     username: "MertJSX",
@@ -113,7 +115,8 @@ const ShareFileComponent = () => {
         }
 
         try {
-            const fullPath = (path === "./") ? itemInfo.name : `${path}${itemInfo.name}`
+            const rawPath = path === "./" ? itemInfo.name : `${path}/${itemInfo.name}`
+            const fullPath = rawPath.replace(/^\.\//, "").replace(/\/+/g, "/")
             await axiosInstance.delete(`/shared/${fullPath}`)
             setShared(null)
             setSharedFile(false)
@@ -166,7 +169,8 @@ const ShareFileComponent = () => {
         }
 
         try {
-            const fullPath = (path === "./") ? itemInfo.name : `${path}${itemInfo.name}`
+            const rawPath = path === "./" ? itemInfo.name : `${path}/${itemInfo.name}`
+            const fullPath = rawPath.replace(/^\.\//, "").replace(/\/+/g, "/")
             await axiosInstance.delete(`/shared/${fullPath}`)
             const response = await axiosInstance.post<{ response: string, shared: Shared }>(`/shared`, {
                 shared: {
@@ -282,7 +286,7 @@ const ShareFileComponent = () => {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={(path === "./") ? itemInfo?.name : `${path}${itemInfo?.name}`}
+                                        value={(path === "./") ? itemInfo?.name : `${path}/${itemInfo?.name}`}
                                         className="bg-transparent text-sm text-gray-300 w-full focus:outline-none truncate"
                                     />
                                 </div>
