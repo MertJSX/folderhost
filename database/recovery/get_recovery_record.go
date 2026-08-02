@@ -16,6 +16,7 @@ func GetRecoveryRecord(id int) (types.RecoveryRecord, error) {
 	if err != nil {
 		return record, fmt.Errorf("error while getting recovery records: %v", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		if err := rows.Scan(

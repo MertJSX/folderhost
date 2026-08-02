@@ -13,6 +13,7 @@ func DeleteRecoveryRecord(id int, scope string) error {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(`
 		DELETE FROM recovery WHERE id = ? AND oldLocation LIKE ?;

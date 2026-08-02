@@ -14,6 +14,7 @@ func CreateRecoveryRecord(record types.RecoveryRecord) error {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
+	defer tx.Rollback()
 
 	stmt, err := tx.Prepare(`
 		INSERT INTO recovery(

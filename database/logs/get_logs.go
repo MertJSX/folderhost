@@ -16,6 +16,7 @@ func SearchLogs(limit, skip int) ([]types.AuditLog, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error while getting recovery records: %v", err)
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var logItem types.AuditLog

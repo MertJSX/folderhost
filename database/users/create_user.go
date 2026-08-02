@@ -20,9 +20,8 @@ func CreateUser(user *types.Account) error {
 		log.Fatal(err)
 		return fmt.Errorf("Begin transaction error: %w", err)
 	}
-	if exists, _ := CheckIfUsernameExists(user.Username); exists {
-		return fmt.Errorf("username already exists")
-	}
+	defer tx.Rollback()
+
 	stmt, err := tx.Prepare(`
 		INSERT INTO users(
 			username,
