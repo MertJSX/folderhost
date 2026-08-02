@@ -1,6 +1,7 @@
-import { FaFolder, FaFileAlt, FaUndo, FaTrash, FaUser, FaCalendar, FaMapMarkerAlt } from "react-icons/fa"
+import { FaUndo, FaTrash, FaUser, FaCalendar, FaMapMarkerAlt } from "react-icons/fa"
 import moment from "moment";
 import { type RecoveryRecord } from "../../types/RecoveryRecord";
+import { DirectoryItemIcon } from "../../utils/DirectoryItemIcon";
 
 interface RecoveryRecordInfoProps {
     recordInfo: RecoveryRecord,
@@ -8,13 +9,13 @@ interface RecoveryRecordInfoProps {
     handleDeleteRecord: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }
 
-const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({ 
-    recordInfo, 
-    handleRecoverRecord, 
-    handleDeleteRecord 
+const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({
+    recordInfo,
+    handleRecoverRecord,
+    handleDeleteRecord
 }) => {
     const logoSize = 70;
-    
+
     const handleRemoveClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         if (!window.confirm("Are you sure you want to permanently remove this record? This action cannot be undone.")) {
             return;
@@ -27,11 +28,16 @@ const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({
             <div className="flex flex-col bg-gray-800 gap-4 rounded-xl shadow-2xl w-full h-full p-6">
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center mb-4">
-                    {recordInfo.isDirectory ? (
-                        <FaFolder size={logoSize} className='text-sky-400 mb-3' />
-                    ) : (
-                        <FaFileAlt size={logoSize} className='text-gray-300 mb-3' />
-                    )}
+                    <div className="flex items-center justify-center mb-3 min-h-[70px]">
+                        <DirectoryItemIcon
+                            logoSize={logoSize}
+                            itemInfo={{
+                                isDirectory: recordInfo.isDirectory,
+                                name: recordInfo.oldLocation.split('/').pop() || recordInfo.oldLocation,
+                                path: recordInfo.oldLocation
+                            } as any}
+                        />
+                    </div>
                     <h1 className="text-xl font-bold text-yellow-200 break-words w-full">
                         {recordInfo.oldLocation.split('/').pop() || recordInfo.oldLocation}
                     </h1>
@@ -96,7 +102,7 @@ const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({
                         <FaUndo className="text-sm" />
                         Recover Item
                     </button>
-                    
+
                     <button
                         onClick={handleRemoveClick}
                         className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"

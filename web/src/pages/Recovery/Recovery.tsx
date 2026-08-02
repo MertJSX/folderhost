@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react"
 import moment from "moment";
 import axiosInstance from "../../utils/axiosInstance"
-import { FaFolder, FaFileAlt, FaTrash, FaSync } from "react-icons/fa";
+import { FaFolder, FaTrash, FaSync } from "react-icons/fa";
 import RecoveryRecordInfo from "../../components/Recovery/RecoveryRecordInfo";
 import { type RecoveryRecord } from "../../types/RecoveryRecord";
 import MessageBox from "../../components/minimal/MessageBox/MessageBox";
 import { FaArrowRotateLeft } from "react-icons/fa6";
+import { DirectoryItemIcon } from "../../utils/DirectoryItemIcon";
 
 const Recovery: React.FC = () => {
     const [recoveryRecords, setRecoveryRecords] = useState<Array<RecoveryRecord>>([]);
@@ -192,11 +193,16 @@ const Recovery: React.FC = () => {
                                             : 'border-gray-600'
                                             }`}
                                     >
-                                        {record.isDirectory ? (
-                                            <FaFolder size={logoSize} className='mx-3 text-sky-400' />
-                                        ) : (
-                                            <FaFileAlt size={logoSize} className='mx-3 text-gray-300' />
-                                        )}
+                                        <div className="flex items-center justify-center min-w-[3rem]">
+                                            <DirectoryItemIcon
+                                                logoSize={logoSize}
+                                                itemInfo={{
+                                                    isDirectory: record.isDirectory,
+                                                    name: record.oldLocation.split('/').pop() || record.oldLocation,
+                                                    path: record.oldLocation
+                                                } as any}
+                                            />
+                                        </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="text-green-200 font-medium truncate">
                                                 {record.oldLocation}
