@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { MdZoomIn, MdZoomOut, MdRotateRight, MdRotateLeft, MdFlip } from 'react-icons/md';
+import { MdZoomIn, MdZoomOut, MdRotateRight, MdRotateLeft, MdFlip, MdPanTool } from 'react-icons/md';
 import { FiMaximize2 } from 'react-icons/fi';
-import { BsArrowsMove, BsZoomIn } from 'react-icons/bs';
+import { BsZoomIn } from 'react-icons/bs';
 
 interface ImageViewerProps {
   objectUrl: string;
@@ -15,7 +15,7 @@ const ImageViewer = ({ objectUrl, fileName }: ImageViewerProps) => {
   const [rotation, setRotation] = useState(0);
   const [flipX, setFlipX] = useState(false);
   const [flipY, setFlipY] = useState(false);
-  const [mode, setMode] = useState<ToolMode>('zoom');
+  const [mode, setMode] = useState<ToolMode>('pan');
   const [isDragging, setIsDragging] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -35,7 +35,7 @@ const ImageViewer = ({ objectUrl, fileName }: ImageViewerProps) => {
         }
       } else {
         switch(e.key.toLowerCase()) {
-          case 'r': setZoom(1); setRotation(0); setFlipX(false); setFlipY(false); setPos({ x: 0, y: 0 }); setMode('zoom'); break;
+          case 'r': setZoom(1); setRotation(0); setFlipX(false); setFlipY(false); setPos({ x: 0, y: 0 }); setMode('pan'); break;
           case ' ': e.preventDefault(); setMode(m => m === 'zoom' ? 'pan' : 'zoom'); break;
         }
       }
@@ -132,12 +132,12 @@ const ImageViewer = ({ objectUrl, fileName }: ImageViewerProps) => {
 
         <div className="flex items-center gap-1">
           <button onClick={() => setMode('zoom')} className={`p-2 rounded-lg ${mode === 'zoom' ? 'bg-sky-500 text-white' : 'hover:bg-gray-600'}`} title="Zoom Mode (Space)"><BsZoomIn size={16} /></button>
-          <button onClick={() => setMode('pan')} className={`p-2 rounded-lg ${mode === 'pan' ? 'bg-sky-500 text-white' : 'hover:bg-gray-600'}`} title="Pan Mode (Space)"><BsArrowsMove size={16} /></button>
+          <button onClick={() => setMode('pan')} className={`p-2 rounded-lg ${mode === 'pan' ? 'bg-sky-500 text-white' : 'hover:bg-gray-600'}`} title="Pan Mode (Space)"><MdPanTool size={16} /></button>
         </div>
 
         <div className="w-px h-6 bg-gray-600" />
 
-        <button onClick={() => { setZoom(1); setRotation(0); setFlipX(false); setFlipY(false); setPos({ x: 0, y: 0 }); setMode('zoom'); }} className="p-2 hover:bg-gray-600 rounded-lg" title="Reset All (R)">↺</button>
+        <button onClick={() => { setZoom(1); setRotation(0); setFlipX(false); setFlipY(false); setPos({ x: 0, y: 0 }); setMode('pan'); }} className="p-2 hover:bg-gray-600 rounded-lg" title="Reset All (R)">↺</button>
 
         <div className="text-xs text-gray-400 ml-2 hidden md:block">
           {mode === 'zoom' ? '🖱️ Scroll Mode' : '🖱️ Drag mode'}
