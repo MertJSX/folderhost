@@ -14,7 +14,12 @@ import (
 )
 
 func PostCreateSharedFile(c *fiber.Ctx) error {
-	// TODO: Permission control, should be added before release.
+	account := c.Locals("account").(types.Account)
+	if !account.Permissions.DownloadFiles {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "You don't have permission to share files (Download permission required)."},
+		)
+	}
 
 	var requestBody struct {
 		Shared types.Shared `json:"shared"`
@@ -26,7 +31,6 @@ func PostCreateSharedFile(c *fiber.Ctx) error {
 		)
 	}
 
-	account := c.Locals("account").(types.Account)
 	requestBody.Shared.Username = account.Username
 	requestBody.Shared.UserID = *account.ID
 

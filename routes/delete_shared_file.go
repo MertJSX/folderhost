@@ -23,6 +23,11 @@ func DeleteSharedFile(c *fiber.Ctx) error {
 	}
 
 	account := c.Locals("account").(types.Account)
+	if !account.Permissions.DownloadFiles {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "You don't have permission to delete shared files (Download permission required)."},
+		)
+	}
 
 	recordPath := path
 	if len(recordPath) > 0 && recordPath[0] != '/' {

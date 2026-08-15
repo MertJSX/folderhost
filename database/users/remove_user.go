@@ -5,8 +5,20 @@ import (
 )
 
 func RemoveUser(id int) error {
-	const query = `DELETE FROM users WHERE id = ?;`
+	tx, err := database.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
 
-	_, err := database.DB.Exec(query, id)
-	return err
+	// Cascade delete shared links
+	if _, err := tx.Exec("DELETE FROM shared WHERE userID = ?", id); err != nil {
+		return err
+	}
+
+	if _, err := tx.Exec("DELETE FROM users WHERE id = ?", id); err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

@@ -35,5 +35,9 @@ func GetSharedFile(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{"err": "Shared not found or access denied."})
 	}
 
+	if record.Password != "" {
+		record.Password = "protected"
+	}
+
 	return c.Status(200).JSON(record)
 }
