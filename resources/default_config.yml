@@ -8,7 +8,7 @@
 # Thanks for using my application!!! Please report if you catch any bugs!
 # Here is the GitHub page of FolderHost: https://github.com/MertJSX/folderhost
 # Contact for security vulnerabilities: contact@mertsami.com
-version: "v26.6.2"
+version: "v26.8.0"
 
 # Port is required. Don't delete it!
 port: 5000
