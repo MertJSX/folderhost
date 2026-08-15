@@ -29,29 +29,23 @@ func InitializeDatabase() {
 	}
 
 	database.DB.SetMaxOpenConns(1)
-	
+
 	_, err = database.DB.Exec("PRAGMA busy_timeout = 5000; PRAGMA foreign_keys = ON;")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if firstTime {
-		database.CreateUsersTable()
-		database.CreateLogsTable()
-		database.CreateRecoveryTable()
-		database.CreateSharedTable()
-		err = users.CreateUser(&config.Config.AdminAccount)
+	// Automatically ensure all tables exist (Safe due to IF NOT EXISTS)
+	// For future releases we can make something better...
+	database.CreateUsersTable()
+	database.CreateLogsTable()
+	database.CreateRecoveryTable()
+	database.CreateSharedTable()
 
+	if firstTime {
+		err = users.CreateUser(&config.Config.AdminAccount)
 		if err != nil {
-			fmt.Println("Error creating Admin account.")
-		}
-	} else {
-		var tableName string
-		err := database.DB.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name='shared';").Scan(&tableName)
-		if err == sql.ErrNoRows {
-			database.CreateSharedTable()
-		} else if err != nil {
-			fmt.Println("Error checking for shared table:", err)
+			fmt.Println("Error creating Admin account:", err)
 		}
 	}
 

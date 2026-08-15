@@ -3,10 +3,32 @@ package database
 import (
 	"fmt"
 	"log"
+	"strings"
 )
 
+func executeBlueprint(tableName string, query string) {
+	var count int
+	err := DB.QueryRow("SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name=?;", tableName).Scan(&count)
+	if err != nil {
+		log.Printf("Error checking existence of table %s: %v\n", tableName, err)
+	}
+
+	_, err = DB.Exec(query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if count == 0 {
+		displayName := tableName
+		if len(tableName) > 0 {
+			displayName = strings.ToUpper(tableName[:1]) + tableName[1:]
+		}
+		fmt.Printf("%s table has been created!\n", displayName)
+	}
+}
+
 func CreateUsersTable() {
-	_, err := DB.Exec(`
+	executeBlueprint("users", `
 		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL UNIQUE,
@@ -34,16 +56,10 @@ func CreateUsersTable() {
         	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 		);
 	`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Users table has been created!")
 }
 
 func CreateLogsTable() {
-	_, err := DB.Exec(`
+	executeBlueprint("logs", `
 		CREATE TABLE IF NOT EXISTS logs (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NOT NULL,
@@ -58,17 +74,10 @@ func CreateLogsTable() {
 		CREATE INDEX IF NOT EXISTS idx_logs_username ON logs(username);
 		CREATE INDEX IF NOT EXISTS idx_logs_created_at ON logs(created_at);
 	`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Logs table has been created!")
-
 }
 
 func CreateRecoveryTable() {
-	_, err := DB.Exec(`
+	executeBlueprint("recovery", `
 		CREATE TABLE IF NOT EXISTS recovery (
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 			username TEXT NULL,
@@ -83,17 +92,10 @@ func CreateRecoveryTable() {
                 ON UPDATE CASCADE
 		);
 	`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Recovery table has been created!")
-
 }
 
 func CreateSharedTable() {
-	_, err := DB.Exec(`
+	executeBlueprint("shared", `
 		CREATE TABLE IF NOT EXISTS shared (
 			id TEXT NOT NULL PRIMARY KEY,
 			username TEXT NOT NULL,
@@ -113,11 +115,4 @@ func CreateSharedTable() {
 				ON UPDATE CASCADE
 		);
 	`)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Shared table has been created!")
-
 }
