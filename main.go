@@ -196,6 +196,8 @@ func main() {
 
 	app.Delete("/api/shared/*", routes.DeleteSharedFile)
 
+	app.Delete("/api/shareds/:id", routes.DeleteSharedByID)
+
 	app.Get("/api/raw/:filepath", routes.RawFile)
 
 	app.Get("/api/recovery", routes.Recovery)
@@ -209,6 +211,8 @@ func main() {
 	app.Get("/api/users", routes.GetAllUsers)
 
 	app.Get("/api/users/:username", routes.GetUser)
+
+	app.Get("/api/users/:username/shared", routes.GetUserShareds)
 
 	app.Put("/api/users/edit", routes.EditUser)
 
