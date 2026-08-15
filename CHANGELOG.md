@@ -6,6 +6,28 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Image Viewer**: Added direct image viewer access from sidebar preview.
+- **Permission Tooltips**: Added tooltips to permission settings to explain what each permission does.
+- **Sharing system**: Now you can share files with your friends using share links. Without needing to set a password to access it. You can also set an expiration date for the share link or an access password for it. Admins can also view and remove everyones shared links.
+
+### Changed
+
+- **Image Viewer**: Set default mode to drag mode.
+
+### Security
+
+- **Login tracking**: Now FolderHost logs the IP addresses and User Agents of the logged in users to provide additional security.
+
+### Fixed
+
+- **Docker versioning**: Fixed issue where docker was not showing the correct version.
+- **Database**: Fixed possible deadlocks.
+- **Login**: Prevent browser autofill from breaking the dark mode input colors.
+
+## [v26.6.2] - 2026-06-29
+
+### Added
+
 - **Config Migration**: Added automatic config.yml migration system.
 - **SSL**: Added SSL configuration to the default configuration file. You can enable it by setting `ssl.enabled` to `true` in the configuration file. There are 2 possible ways to use it. The first one is to use a self signed certificate. The second one is to use a let's encrypt certificate. If you don't have a domain or you don't want to use let's encrypt certificate just use the self signed certificate.
 
