@@ -8,6 +8,7 @@ type SSLConfig struct {
 }
 
 type ConfigFile struct {
+	Version         string `yaml:"version"`
 	Port            int    `yaml:"port"`
 	Folder          string `yaml:"folder"`
 	StorageLimit    string `yaml:"storage_limit"`

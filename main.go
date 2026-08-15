@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"runtime"
 	"strings"
 	"syscall"
@@ -18,6 +19,7 @@ import (
 	"github.com/MertJSX/folderhost/database/initialize"
 	"github.com/MertJSX/folderhost/middleware"
 	fhWS "github.com/MertJSX/folderhost/middleware/websocket"
+	"github.com/MertJSX/folderhost/resources"
 	_ "github.com/MertJSX/folderhost/resources"
 	"github.com/MertJSX/folderhost/routes"
 	"github.com/MertJSX/folderhost/types"
@@ -46,6 +48,17 @@ var (
 )
 
 func main() {
+	if Version == "unknown" {
+		defaultConfigBytes, err := resources.DefaultConfig.ReadFile("default_config.yml")
+		if err == nil {
+			re := regexp.MustCompile(`(?m)^version:\s*"([^"]+)"`)
+			matches := re.FindStringSubmatch(string(defaultConfigBytes))
+			if len(matches) > 1 {
+				Version = matches[1]
+			}
+		}
+	}
+
 	app := fiber.New(fiber.Config{
 		BodyLimit:             10 * 1024 * 1024, // 10 MB
 		AppName:               "FolderHost",
@@ -112,7 +125,7 @@ func main() {
 		}
 
 		log.Println("Stopping program...")
-		
+
 		if database.DB != nil {
 			database.DB.Close()
 		}
