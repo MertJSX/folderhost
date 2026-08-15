@@ -227,11 +227,13 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaEye size={iconSize} />Read & View Access</h3>
                                 <PermissionToggle
                                     label="Read Directories"
+                                    info="Allows the user to view folders and their contents."
                                     checked={user.permissions.read_directories}
                                     onChange={(checked) => handlePermissionChange('read_directories', checked)}
                                 />
                                 <PermissionToggle
                                     label="Read Files"
+                                    info="Allows the user to view and open files."
                                     checked={user.permissions.read_files}
                                     onChange={(checked) => handlePermissionChange('read_files', checked)}
                                 />
@@ -242,11 +244,13 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaDownload size={iconSize} />File Transfer</h3>
                                 <PermissionToggle
                                     label="Download Files"
+                                    info="Allows the user to download files and create public shared links."
                                     checked={user.permissions.download_files}
                                     onChange={(checked) => handlePermissionChange('download_files', checked)}
                                 />
                                 <PermissionToggle
                                     label="Upload Files"
+                                    info="Allows the user to upload new files to the server."
                                     checked={user.permissions.upload_files}
                                     onChange={(checked) => handlePermissionChange('upload_files', checked)}
                                 />
@@ -257,21 +261,25 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaPen size={iconSize} />Content Modification</h3>
                                 <PermissionToggle
                                     label="Create Items"
+                                    info="Allows the user to create new folders and text files."
                                     checked={user.permissions.create}
                                     onChange={(checked) => handlePermissionChange('create', checked)}
                                 />
                                 <PermissionToggle
                                     label="Change Files"
+                                    info="Allows the user to edit the contents of existing text files."
                                     checked={user.permissions.change}
                                     onChange={(checked) => handlePermissionChange('change', checked)}
                                 />
                                 <PermissionToggle
                                     label="Rename Items"
+                                    info="Allows the user to rename files and folders."
                                     checked={user.permissions.rename}
                                     onChange={(checked) => handlePermissionChange('rename', checked)}
                                 />
                                 <PermissionToggle
                                     label="Delete Items"
+                                    info="Allows the user to move files and folders to the recovery bin."
                                     checked={user.permissions.delete}
                                     onChange={(checked) => handlePermissionChange('delete', checked)}
                                 />
@@ -282,21 +290,25 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaFile size={iconSize} />File Organization</h3>
                                 <PermissionToggle
                                     label="Move Items"
+                                    info="Allows the user to move files and folders."
                                     checked={user.permissions.move}
                                     onChange={(checked) => handlePermissionChange('move', checked)}
                                 />
                                 <PermissionToggle
                                     label="Copy Items"
+                                    info="Allows the user to duplicate files and folders."
                                     checked={user.permissions.copy}
                                     onChange={(checked) => handlePermissionChange('copy', checked)}
                                 />
                                 <PermissionToggle
                                     label="Extract Archives"
+                                    info="Allows the user to extract contents from ZIP or tar.gz files."
                                     checked={user.permissions.extract}
                                     onChange={(checked) => handlePermissionChange('extract', checked)}
                                 />
                                 <PermissionToggle
                                     label="Archive Folders"
+                                    info="Allows the user to compress folders into ZIP archives."
                                     checked={user.permissions.archive}
                                     onChange={(checked) => handlePermissionChange('archive', checked)}
                                 />
@@ -307,11 +319,13 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaArrowRotateLeft size={iconSize} />Recovery Management</h3>
                                 <PermissionToggle
                                     label="Read Recovery"
+                                    info="Allows the user to view the recovery bin contents."
                                     checked={user.permissions.read_recovery}
                                     onChange={(checked) => handlePermissionChange('read_recovery', checked)}
                                 />
                                 <PermissionToggle
                                     label="Use Recovery"
+                                    info="Allows the user to restore or permanently delete items from the recovery bin."
                                     checked={user.permissions.use_recovery}
                                     onChange={(checked) => handlePermissionChange('use_recovery', checked)}
                                 />
@@ -322,16 +336,19 @@ const EditUser = () => {
                                 <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaShieldAlt />Administration</h3>
                                 <PermissionToggle
                                     label="Read Users"
+                                    info="Allows the user to view the list of registered users."
                                     checked={user.permissions.read_users}
                                     onChange={(checked) => handlePermissionChange('read_users', checked)}
                                 />
                                 <PermissionToggle
                                     label="Edit Users"
+                                    info="Allows the user to modify permissions, delete accounts, and manage user shared links."
                                     checked={user.permissions.edit_users}
                                     onChange={(checked) => handlePermissionChange('edit_users', checked)}
                                 />
                                 <PermissionToggle
                                     label="Read Logs"
+                                    info="Allows the user to view the system audit logs."
                                     checked={user.permissions.read_logs}
                                     onChange={(checked) => handlePermissionChange('read_logs', checked)}
                                 />
