@@ -6,6 +6,7 @@ import { type ExplorerContextType } from '../../types/ExplorerContextType';
 import { DirectoryItemIcon } from '../../utils/DirectoryItemIcon';
 import axiosInstance from '../../utils/axiosInstance';
 import { isImageItem } from '../../utils/isImageItem';
+import { FaSearchPlus } from "react-icons/fa";
 
 const ItemInfo = () => {
   const renameInput = useRef<HTMLInputElement>(null)
@@ -27,7 +28,8 @@ const ItemInfo = () => {
     zipProgress,
     startZipping,
     setShowUploadMenu,
-    setShowShareModal
+    setShowShareModal,
+    setShowFileViewer
   } = useContext<ExplorerContextType>(ExplorerContext)
 
   const [imageData, setImageData] = useState("")
@@ -94,13 +96,22 @@ const ItemInfo = () => {
               )}
 
               {!imageLoading && !imageError && imageData && (
-                <img
-                  src={imageData}
-                  alt={itemInfo?.name || ''}
-                  width={300}
-                  onError={() => setImageError(true)}
-                  className="max-w-[200px] max-h-[200px] object-contain"
-                />
+                <div 
+                  className="relative group cursor-pointer"
+                  onClick={() => setShowFileViewer(true)}
+                  title="Click to view image"
+                >
+                  <img
+                    src={imageData}
+                    alt={itemInfo?.name || ''}
+                    width={300}
+                    onError={() => setImageError(true)}
+                    className="max-w-[200px] max-h-[200px] object-contain transition-all duration-300 group-hover:brightness-50"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <FaSearchPlus className="text-white text-4xl drop-shadow-lg" />
+                  </div>
+                </div>
               )}
             </div>
           ) : itemInfo ? (
