@@ -10,19 +10,23 @@ All notable changes to this project will be documented in this file.
 - **Permission Tooltips**: Added tooltips to permission settings to explain what each permission does.
 - **Sharing system**: Now you can share files with your friends using share links. Without needing to set a password to access it. You can also set an expiration date for the share link or an access password for it. Admins can also view and remove everyones shared links.
 
+<img width="553" height="303" alt="image" src="https://github.com/user-attachments/assets/71afb74c-7e56-4cd5-99df-5cc1ebfd7ac3" />
+
+
 ### Changed
 
 - **Image Viewer**: Set default mode to drag mode.
 
 ### Security
 
-- **Login tracking**: Now FolderHost logs the IP addresses and User Agents of the logged in users to provide additional security.
+- **Login tracking**: Now FolderHost locally logs the IP addresses and User Agents of the logged in users to provide additional security.
 
 ### Fixed
 
 - **Docker versioning**: Fixed issue where docker was not showing the correct version.
 - **Database**: Fixed possible deadlocks.
 - **Login**: Prevent browser autofill from breaking the dark mode input colors.
+- **Recovery**: Fixed icon bugs in file recovery.
 
 ## [v26.6.2] - 2026-06-29
 
