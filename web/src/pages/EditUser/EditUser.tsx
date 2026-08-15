@@ -11,6 +11,7 @@ import { useCallback } from "react"
 import { FaEye, FaDownload, FaFile, FaPen, FaShieldAlt } from "react-icons/fa";
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import ChangeUserPassword from "../../components/minimal/ChangeUserPassword/ChangeUserPassword"
+import UserSharedLinks from "../../components/UserSharedLinks/UserSharedLinks";
 
 const EditUser = () => {
     const params = useParams();
@@ -338,6 +339,11 @@ const EditUser = () => {
                         </div>
                     </div>
                 </section>
+
+                <hr className="border-gray-600" />
+                <div className="px-6 pb-4">
+                    <UserSharedLinks username={username as string} />
+                </div>
 
                 {/* Submit Button */}
                 <div className="flex justify-center gap-2 pt-4 border-t border-gray-600">
