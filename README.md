@@ -72,6 +72,12 @@ There are 2 possible ways to run FolderHost. The first one is using Docker, and 
     mertjsx/folderhost:latest
 ```
 
+### Easypanel
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform with a one-click FolderHost template:
+
+[![Deploy on Easypanel](https://easypanel.io/img/deploy-on-easypanel-40.svg)](https://easypanel.io/templates/folderhost)
+
 ### Binary Installation
 
 First of all you need to create a folder to store your files and the binary. Then you can run the binary. Otherwise it's going to create a lot of files in your current directory. This is just for the ones that don't want to use docker.
