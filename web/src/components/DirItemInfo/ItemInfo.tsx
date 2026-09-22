@@ -84,7 +84,7 @@ const ItemInfo = () => {
   }, [itemInfo])
 
   return (
-    <div className='flex flex-col items-center justify-center w-1/3 mx-auto min-w-[320px] max-w-[30%] min-h-[600px] h-[700px] max-h-[800px]'>
+    <div className='flex flex-col items-center justify-center w-full mt-5 md:mt-0 lg:w-1/3 mx-auto min-w-[320px] lg:max-w-[30%] 2xl:min-h-[600px] 2xl:h-[700px] max-h-[800px]'>
       <div className='flex flex-col bg-gray-800 items-center justify-center gap-3 rounded-xl shadow-2xl w-full h-auto p-4 min-h-[400px]'>
         {
           isImageItem(itemInfo) && !imageError ? (
