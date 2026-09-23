@@ -4,13 +4,28 @@ import { AiOutlineFileAdd, AiOutlineFolderAdd } from "react-icons/ai";
 import { IoClose } from "react-icons/io5";
 import { useState } from "react";
 
+const Kbd: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <kbd className="ml-1 inline-flex items-center gap-0.5 rounded border border-white/20 bg-white/10 px-1.5 py-0.5 text-[10px] font-medium leading-none text-white/70">
+        {children}
+    </kbd>
+)
+
 const CreateDirectoryItem: React.FC = () => {
     const { createItem, path, showCreateItemMenu, setShowCreateItemMenu } = useContext(ExplorerContext)
     const [itemName, setItemName] = useState<string>("")
+    const [isDirectory, setIsDirectory] = useState<boolean>(true)
 
     useEffect(() => {
         setItemName("");
     }, [showCreateItemMenu])
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key !== "Enter") return
+        if (itemName.trim() === "") return
+        const dir = !itemName.includes(".")
+        setShowCreateItemMenu?.(false)
+        createItem(path, dir, itemName)
+    }
 
     return showCreateItemMenu && (
         <section className='bg-black fixed inset-0 flex items-center justify-center w-full bg-opacity-60 z-30 animate-in fade-in duration-200'>
@@ -22,6 +37,7 @@ const CreateDirectoryItem: React.FC = () => {
                         <p className="text-sm text-slate-400 mt-1">Enter a name for your file or folder</p>
                     </div>
                     <button
+                        type="button"
                         onClick={() => setShowCreateItemMenu?.(false)}
                         className="p-2 hover:bg-slate-700 rounded-lg transition-all text-slate-400 hover:text-white"
                         aria-label="Close"
@@ -43,7 +59,9 @@ const CreateDirectoryItem: React.FC = () => {
                         value={itemName}
                         onChange={(e) => {
                             setItemName(e.target.value)
+                            setIsDirectory(!e.target.value.includes("."))
                         }}
+                        onKeyDown={handleKeyDown}
                         autoComplete="off"
                         autoFocus
                     />
@@ -51,32 +69,51 @@ const CreateDirectoryItem: React.FC = () => {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-3">
-                    {itemName != "" ?
-                    <div className="flex gap-3">
-                        <button
-                            className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-green-600 hover:bg-green-500 active:scale-[0.98] text-white shadow-lg hover:shadow-green-500/20'
-                            onClick={() => {
-                                setShowCreateItemMenu?.(false)
-                                createItem(path, false, itemName)
-                            }}
-                        >
-                            <AiOutlineFileAdd size={22} />
-                            Create File
-                        </button>
-                        <button
-                            className='flex gap-2 items-center justify-center flex-1 py-3 px-4 font-semibold rounded-lg transition-all bg-sky-600 hover:bg-sky-500 active:scale-[0.98] text-white shadow-lg hover:shadow-sky-500/20'
-                            onClick={() => {
-                                setShowCreateItemMenu?.(false)
-                                createItem(path, true, itemName)
-                            }}
-                        >
-                            <AiOutlineFolderAdd size={22} />
-                            Create Folder
-                        </button>
-                    </div> : null}
-                    
+                    {itemName !== "" && (
+                        <div className="flex gap-3">
+                            {/* Create File */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowCreateItemMenu?.(false)
+                                    createItem(path, false, itemName)
+                                }}
+                                className={
+                                    "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-colors active:scale-[0.98] " +
+                                    (!isDirectory
+                                        ? "bg-emerald-700 text-white hover:bg-emerald-600"
+                                        : "bg-slate-700/60 text-slate-400 hover:bg-slate-700 hover:text-slate-200")
+                                }
+                            >
+                                <AiOutlineFileAdd size={20} />
+                                <span>Create File</span>
+                                {!isDirectory && <Kbd>↵</Kbd>}
+                            </button>
+
+                            {/* Create Folder */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShowCreateItemMenu?.(false)
+                                    createItem(path, true, itemName)
+                                }}
+                                className={
+                                    "flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-3 font-semibold transition-colors active:scale-[0.98] " +
+                                    (isDirectory
+                                        ? "bg-sky-600 text-white hover:bg-sky-600"
+                                        : "bg-slate-700/60 text-slate-400 hover:bg-slate-700 hover:text-slate-200")
+                                }
+                            >
+                                <AiOutlineFolderAdd size={20} />
+                                <span>Create Folder</span>
+                                {isDirectory && <Kbd>↵</Kbd>}
+                            </button>
+                        </div>
+                    )}
+
                     <button
-                        className='w-full py-3 px-4 font-semibold rounded-lg transition-all bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white active:scale-[0.98]'
+                        type="button"
+                        className='w-full rounded-lg border border-slate-600 bg-slate-700 px-4 py-3 font-semibold text-white transition-colors hover:bg-slate-600 active:scale-[0.98]'
                         onClick={() => setShowCreateItemMenu?.(false)}
                     >
                         Cancel
