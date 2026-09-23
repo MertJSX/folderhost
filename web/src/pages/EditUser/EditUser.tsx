@@ -151,7 +151,7 @@ const EditUser = () => {
             <ChangeUserPassword show={showChangePassMenu} setShow={setShowChangePassMenu} user={user} />
             <section className="my-10 flex flex-col bg-gray-800 gap-6 md:w-4/5 mx-auto p-6 max-w-[1000px] min-h-[600px] shadow-2xl rounded-lg">
                 <div className="flex justify-between items-center">
-                    <h1 className="flex text-3xl items-center gap-3 text-white font-semibold">
+                    <h1 className="flex text-xl 2xl:text-2xl items-center gap-3 text-white font-semibold">
                         <FaUserEdit className="text-blue-400" /> Edit: {username}
                     </h1>
                     <Link
@@ -168,7 +168,7 @@ const EditUser = () => {
                     {/* Basic Information */}
                     <div className="space-y-4">
                         <h2 className="text-xl text-white font-semibold">Basic Information</h2>
-                        <div className="grid grid-cols-1 gap-4">
+                        <div className="grid grid-cols-1 gap-4 text-base">
                             <input
                                 type="text"
                                 placeholder="Username (Required)"
@@ -194,7 +194,7 @@ const EditUser = () => {
                                 onClick={() => {
                                     setShowChangePassMenu((prev) => !prev)
                                 }}
-                                className="text-lg bg-sky-700 hover:bg-sky-600 p-2 px-10 rounded-lg">
+                                className="bg-sky-700 hover:bg-sky-600 p-2 px-10 rounded-lg">
                                 Change Password
                             </button>
 
@@ -209,14 +209,14 @@ const EditUser = () => {
                                 onClick={() => {
                                     enableAllPermissions()
                                 }}
-                                className="text-lg bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
+                                className="text-base bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
                                 Give all
                             </button>
                             <button
                                 onClick={() => {
                                     disableAllPermissions()
                                 }}
-                                className="text-lg bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
+                                className="text-base bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
                                 Take all
                             </button>
 
@@ -224,7 +224,7 @@ const EditUser = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg">
                             {/* Read & View Access */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaEye size={iconSize} />Read & View Access</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaEye size={iconSize} />Read & View Access</h3>
                                 <PermissionToggle
                                     label="Read Directories"
                                     info="Allows the user to view folders and their contents."
@@ -241,7 +241,7 @@ const EditUser = () => {
 
                             {/* File Transfer */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaDownload size={iconSize} />File Transfer</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaDownload size={iconSize} />File Transfer</h3>
                                 <PermissionToggle
                                     label="Download Files"
                                     info="Allows the user to download files and create public shared links."
@@ -258,7 +258,7 @@ const EditUser = () => {
 
                             {/* Content Modification */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaPen size={iconSize} />Content Modification</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaPen size={iconSize} />Content Modification</h3>
                                 <PermissionToggle
                                     label="Create Items"
                                     info="Allows the user to create new folders and text files."
@@ -287,7 +287,7 @@ const EditUser = () => {
 
                             {/* File Organization */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaFile size={iconSize} />File Organization</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaFile size={iconSize} />File Organization</h3>
                                 <PermissionToggle
                                     label="Move Items"
                                     info="Allows the user to move files and folders."
@@ -316,7 +316,7 @@ const EditUser = () => {
 
                             {/* Recovery Management */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaArrowRotateLeft size={iconSize} />Recovery Management</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaArrowRotateLeft size={iconSize} />Recovery Management</h3>
                                 <PermissionToggle
                                     label="Read Recovery"
                                     info="Allows the user to view the recovery bin contents."
@@ -333,7 +333,7 @@ const EditUser = () => {
 
                             {/* Administration */}
                             <div className="space-y-3">
-                                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaShieldAlt />Administration</h3>
+                                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaShieldAlt />Administration</h3>
                                 <PermissionToggle
                                     label="Read Users"
                                     info="Allows the user to view the list of registered users."
@@ -367,14 +367,14 @@ const EditUser = () => {
                     <button
                         onClick={handleSubmit}
                         disabled={!user.username || !hasChanges()}
-                        className="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 w-2/3"
+                        className="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 w-2/3"
                     >
                         Submit Changes
                     </button>
                     <button
                         title="Double click to remove"
                         onClick={handleRemove}
-                        className="bg-red-500 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 w-1/3"
+                        className="bg-red-500 hover:bg-red-700 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 w-1/3"
                     >
                         Remove Account
                     </button>

@@ -137,18 +137,18 @@ const Recovery: React.FC = () => {
         <div>
             {/* <Header /> */}
             <MessageBox message={message} isErr={isError} setMessage={setMessage} />
-            <main className="mt-10">
+            <main className="mt-5">
                 <div className="flex flex-col md:flex-row justify-center items-center px-6">
-                    <section className="flex flex-col bg-gray-800 gap-4 w-4/5 max-w-[1000px] p-4 md:p-6 min-w-[400px] md:min-w-[600px] min-h-[600px] h-[700px] max-h-[800px] shadow-2xl rounded-lg">
+                    <section className="flex flex-col bg-gray-800 gap-4 w-4/5 max-w-[1000px] p-4 md:p-6 min-w-[400px] md:min-w-[600px] min-h-[550px] 2xl:min-h-[600px] h-[550px] 2xl:h-[700px] max-h-[800px] shadow-2xl rounded-lg">
                         {/* Header Section */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                             <div className="flex items-center gap-3">
-                                <div className="p-3 bg-sky-500 rounded-lg">
+                                <div className="p-2 2xl:p-3 bg-sky-500 rounded-lg">
                                     <FaArrowRotateLeft size={28} className="text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl font-bold text-white">Recovery Bin</h1>
-                                    <p className="text-gray-400">Restore deleted files and folders</p>
+                                    <h1 className="text-xl 2xl:text-2xl font-bold text-white">Recovery Bin</h1>
+                                    <p className="text-sm 2xl:text-base text-gray-400">Restore deleted files and folders</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">
@@ -162,7 +162,7 @@ const Recovery: React.FC = () => {
                         <div className="flex flex-col md:flex-row gap-3">
                             <button
                                 onClick={handleClearRecords}
-                                className="flex items-center justify-center gap-2 bg-red-700 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1"
+                                className="flex items-center justify-center gap-2 bg-red-700 hover:bg-red-600 text-white font-semibold py-1 px-4 rounded text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-1"
                                 title="Clear all recovery records"
                                 disabled={recoveryRecords.length === 0}
                             >
@@ -171,7 +171,7 @@ const Recovery: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => getRecoveryRecords(true)}
-                                className="flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded transition-colors flex-1"
+                                className="flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-1 px-4 rounded text-sm transition-colors flex-1"
                                 title="Refresh recovery records"
                             >
                                 <FaSync className={`text-sm ${isLoading ? "animate-spin-once" : ""}`} />
@@ -182,13 +182,13 @@ const Recovery: React.FC = () => {
                         <hr className="border-gray-600" />
 
                         {/* Records List */}
-                        <section className="flex flex-col gap-3 overflow-y-auto flex-1 pr-2">
+                        <section className="flex flex-col gap-1 overflow-y-auto flex-1 pr-2">
                             {recoveryRecords[0] ? (
                                 recoveryRecords.map((record) => (
                                     <article
                                         onClick={() => setRecordInfo(record)}
                                         key={record.id}
-                                        className={`flex items-center p-3 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-sky-400 hover:translate-x-1 ${recordInfo?.id === record.id
+                                        className={`flex items-center p-1 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-sky-400 hover:translate-x-1 ${recordInfo?.id === record.id
                                             ? 'border-sky-500 bg-gray-500'
                                             : 'border-gray-600'
                                             }`}
@@ -211,7 +211,7 @@ const Recovery: React.FC = () => {
                                                 {moment(record.created_at).format("Do MMMM YYYY HH:mm")}
                                             </div>
                                         </div>
-                                        <div className="text-right text-gray-300 whitespace-nowrap ml-4">
+                                        <div className="text-sm text-right text-gray-300 whitespace-nowrap ml-4">
                                             {record.sizeDisplay}
                                         </div>
                                     </article>

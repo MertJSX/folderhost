@@ -296,12 +296,12 @@ const FileExplorer: React.FC = () => {
       {/* Header Section */}
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-sky-500 rounded-lg">
+          <div className="p-2 2xl:p-3 bg-sky-500 rounded-lg">
             <MdExplore size={24} className="text-white" />
           </div>
           <div>
-            <h1 className='text-xl md:text-2xl font-bold text-white'>File Explorer</h1>
-            <p className='text-gray-400 text-sm md:text-base'>Browse and manage your files</p>
+            <h1 className='text-xl 2xl:text-2xl font-bold text-white'>File Explorer</h1>
+            <p className='text-gray-400 text-sm 2xl:text-base'>Browse and manage your files</p>
           </div>
         </div>
 
