@@ -109,9 +109,9 @@ const ImageViewer = ({ objectUrl, fileName }: ImageViewerProps) => {
   };
 
   return (
-    <div className="flex flex-col flex-1 gap-4 min-h-0">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* Toolbar */}
-      <div className="flex items-center justify-between bg-gray-700 rounded-lg p-1 border border-gray-600">
+      <div className="flex items-center justify-between bg-gray-700 px-2 border border-gray-600">
         <div className="flex items-center gap-1">
           <button onClick={() => setZoom(z => Math.max(z - 0.2, 0.5))} className="p-2 hover:bg-gray-600 rounded-lg" title="Zoom Out"> <MdZoomOut size={18} /></button>
           <span className="text-white text-sm min-w-[60px] text-center">{Math.round(zoom * 100)}%</span>
@@ -146,7 +146,7 @@ const ImageViewer = ({ objectUrl, fileName }: ImageViewerProps) => {
 
       {/* Image Container */}
       <div 
-        className="flex-1 flex items-center justify-center overflow-hidden bg-gray-900 rounded-lg border border-gray-600 relative select-none"
+        className="flex-1 flex items-center justify-center overflow-hidden bg-gray-900 border border-gray-600 relative select-none"
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
