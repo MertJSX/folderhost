@@ -35,6 +35,7 @@ const getDefaultPermissions = (): AccountPermissions => {
         use_recovery: false,
         read_users: false,
         edit_users: false,
-        read_logs: false
+        read_logs: false,
+        archive: false
     }
 }
