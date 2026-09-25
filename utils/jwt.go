@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -11,7 +12,7 @@ func CreateToken(username string, secretKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"username": username,
-			"exp":      1790520591,
+			"exp":      time.Now().Add(time.Hour * 24).Unix(),
 			"jti":      uuid.New().String(),
 		})
 
