@@ -32,8 +32,9 @@ const RenameDirectoryItem: React.FC = () => {
     }, [handleEnterKeyDown]);
 
     return showRenameItemMenu && (
-        <section className='bg-black fixed inset-0 flex items-center justify-center w-full bg-opacity-60 z-30 animate-in fade-in duration-200'>
-            <div className='flex flex-col bg-slate-800 border border-slate-700 rounded-xl w-full max-w-lg p-6 shadow-2xl animate-in zoom-in-95 duration-200'>
+        <section className='bg-black fixed inset-0 flex items-center justify-center w-full bg-opacity-60 z-30 animate-in fade-in duration-200'
+            onClick={() => setShowRenameItemMenu?.(false)}>
+            <div onClick={(e) => e.stopPropagation()} className='flex flex-col bg-slate-800 border border-slate-700 rounded-xl w-full max-w-lg p-6 shadow-2xl animate-in zoom-in-95 duration-200'>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
