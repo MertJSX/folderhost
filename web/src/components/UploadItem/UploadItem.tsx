@@ -1,16 +1,27 @@
-import { useState, useRef, useContext } from 'react';
+import { useState, useRef, useContext, useEffect } from 'react';
 import { FiUpload, FiX, FiCheck, FiLoader, FiFile } from "react-icons/fi";
 import ExplorerContext from '../../utils/ExplorerContext';
 import axiosInstance from '../../utils/axiosInstance';
 import type { AxiosError } from 'axios';
+import {type FileItem} from '../../types/FileItem';
 
-interface FileItem {
-    id: string;
-    file: File;
-    progress: number;
-    status: 'pending' | 'uploading' | 'success' | 'error';
-    error?: string;
-}
+const CHUNK_SIZE = 16 * 1024 * 1024;
+const PARALLEL_CHUNKS = 3;
+
+const formatBytes = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+const formatTime = (seconds: number) => {
+    if (!isFinite(seconds) || seconds < 0) return '--:--';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+};
 
 const UploadItem = () => {
     const { path, setShowUploadMenu, readDir } = useContext(ExplorerContext);
@@ -20,29 +31,93 @@ const UploadItem = () => {
     const [dragActive, setDragActive] = useState<boolean>(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const formatBytes = (bytes: number) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-    };
+    const [, setTick] = useState(0);
+    useEffect(() => {
+        if (!uploading) return;
+        const id = setInterval(() => setTick(t => t + 1), 1000);
+        return () => clearInterval(id);
+    }, [uploading]);
 
     const handleFiles = (selectedFiles: FileList | null) => {
         if (!selectedFiles) return;
-
         const newFiles: FileItem[] = Array.from(selectedFiles).map(file => ({
             id: `${Date.now()}_${Math.random()}_${file.name}`,
             file: file,
             progress: 0,
+            loaded: 0,
             status: 'pending'
         }));
-
         setFiles(prev => [...prev, ...newFiles]);
     };
 
     const removeFile = (id: string) => {
         setFiles(prev => prev.filter(f => f.id !== id));
+    };
+
+    const uploadSingleFile = async (fileItem: FileItem) => {
+        const file = fileItem.file;
+        const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+        const fileID = `${Date.now()}_${Math.random().toString(36).slice(2)}_${file.name}`;
+        const chunkLoaded = new Array(totalChunks).fill(0);
+
+        const startedAt = Date.now();
+        setFiles(prev => prev.map(f =>
+            f.id === fileItem.id ? { ...f, startedAt } : f
+        ));
+
+        const updateOverallProgress = () => {
+            const totalLoaded = chunkLoaded.reduce((a, b) => a + b, 0);
+            const overallProgress = (totalLoaded / file.size) * 100;
+            const elapsed = (Date.now() - startedAt) / 1000;
+            const speed = elapsed > 0 ? totalLoaded / elapsed : 0;
+
+            setFiles(prev => prev.map(f =>
+                f.id === fileItem.id
+                    ? { ...f, progress: overallProgress, loaded: totalLoaded, speed }
+                    : f
+            ));
+        };
+
+        const uploadChunk = async (i: number) => {
+            const start = i * CHUNK_SIZE;
+            const end = Math.min(start + CHUNK_SIZE, file.size);
+            const chunk = file.slice(start, end);
+
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('chunkIndex', i.toString());
+            formData.append('totalChunks', totalChunks.toString());
+            formData.append('fileID', fileID);
+            formData.append('fileName', file.name);
+            formData.append('chunkSize', CHUNK_SIZE.toString());
+
+            let previousLoaded = 0;
+
+            await axiosInstance.post(
+                `/upload?path=${path.slice(1)}`,
+                formData,
+                {
+                    onUploadProgress: (progressEvent) => {
+                        const loaded = progressEvent.loaded;
+                        chunkLoaded[i] += (loaded - previousLoaded);
+                        previousLoaded = loaded;
+                        updateOverallProgress();
+                    }
+                }
+            );
+        };
+
+        for (let i = 0; i < totalChunks; i += PARALLEL_CHUNKS) {
+            const batch = [];
+            for (let j = i; j < i + PARALLEL_CHUNKS && j < totalChunks; j++) {
+                batch.push(uploadChunk(j));
+            }
+            await Promise.all(batch);
+        }
+
+        setFiles(prev => prev.map(f =>
+            f.id === fileItem.id ? { ...f, status: 'success', progress: 100, loaded: file.size } : f
+        ));
     };
 
     const uploadFiles = async () => {
@@ -52,64 +127,39 @@ const UploadItem = () => {
         setUploading(true);
         setUploadProgress(0);
 
-        setFiles(prev => prev.map(f => 
-            f.status === 'pending' ? { ...f, status: 'uploading', progress: 0 } : f
+        setFiles(prev => prev.map(f =>
+            f.status === 'pending' ? { ...f, status: 'uploading', progress: 0, loaded: 0 } : f
         ));
 
-        const chunkSize: number = 5 * 1024 * 1024;
         let completedFiles = 0;
-        
+
         for (const fileItem of pendingFiles) {
-            const file = fileItem.file;
-            const totalChunks: number = Math.ceil(file.size / chunkSize);
-            const fileID: string = `${Date.now()}_${file.name}`;
-            
             try {
-                for (let i = 0; i < totalChunks; i++) {
-                    const chunk = file.slice(i * chunkSize, (i + 1) * chunkSize);
-                    const formData = new FormData();
-                    formData.append('file', chunk);
-                    formData.append('chunkIndex', i.toString());
-                    formData.append('totalChunks', totalChunks.toString());
-                    formData.append('fileID', fileID);
-                    formData.append('fileName', file.name);
-
-                    const response = await axiosInstance.post(`/upload?path=${path.slice(1)}`, formData);
-
-                    const chunkProgress = ((i + 1) / totalChunks) * 100;
-                    setFiles(prev => prev.map(f =>
-                        f.id === fileItem.id ? { ...f, progress: chunkProgress } : f
-                    ));
-
-                    if (response.data.uploaded) {
-                        setFiles(prev => prev.map(f =>
-                            f.id === fileItem.id ? { ...f, status: 'success', progress: 100 } : f
-                        ));
-                        
-                        completedFiles++;
-                        setUploadProgress((completedFiles / pendingFiles.length) * 100);
-                    }
-                }
+                await uploadSingleFile(fileItem);
             } catch (error) {
                 const err = error as AxiosError<{ err?: string }>;
                 setFiles(prev => prev.map(f =>
-                    f.id === fileItem.id ? { ...f, status: 'error', error: err.response?.data?.err || "Upload failed" } : f
+                    f.id === fileItem.id
+                        ? { ...f, status: 'error', error: err.response?.data?.err || "Upload failed" }
+                        : f
                 ));
-                
-                completedFiles++;
-                setUploadProgress((completedFiles / pendingFiles.length) * 100);
             }
+
+            completedFiles++;
+            setUploadProgress((completedFiles / pendingFiles.length) * 100);
         }
 
         setUploading(false);
         readDir();
-        
-        // Auto close after 2 seconds if all files succeeded
+
         setTimeout(() => {
-            if (files.every(f => f.status === 'success')) {
-                setShowUploadMenu(false);
-                setFiles([]);
-            }
+            setFiles(prev => {
+                if (prev.length > 0 && prev.every(f => f.status === 'success')) {
+                    setShowUploadMenu(false);
+                    return [];
+                }
+                return prev;
+            });
         }, 2000);
     };
 
@@ -120,6 +170,8 @@ const UploadItem = () => {
         success: files.filter(f => f.status === 'success').length,
         error: files.filter(f => f.status === 'error').length
     };
+
+    const activeFile = files.find(f => f.status === 'uploading');
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-30">
@@ -214,40 +266,77 @@ const UploadItem = () => {
                             )}
                         </div>
 
-                        {files.map((fileItem) => (
-                            <div key={fileItem.id} className="bg-gray-900 rounded-lg p-2">
-                                <div className="flex items-center justify-between gap-2">
-                                    <FiFile className="text-gray-400 flex-shrink-0" />
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-white text-sm truncate">{fileItem.file.name}</p>
-                                        <p className="text-gray-500 text-xs">{formatBytes(fileItem.file.size)}</p>
-                                        {fileItem.status === 'uploading' && (
-                                            <div className="mt-1">
-                                                <div className="w-full bg-gray-700 rounded-full h-1">
-                                                    <div
-                                                        className="bg-sky-500 h-1 rounded-full transition-all"
-                                                        style={{ width: `${fileItem.progress}%` }}
-                                                    />
-                                                </div>
+                        {files.map((fileItem) => {
+                            const elapsed = fileItem.startedAt
+                                ? (Date.now() - fileItem.startedAt) / 1000
+                                : 0;
+                            const remaining = fileItem.speed && fileItem.speed > 0
+                                ? (fileItem.file.size - fileItem.loaded) / fileItem.speed
+                                : 0;
+
+                            return (
+                                <div key={fileItem.id} className="bg-gray-900 rounded-lg p-2">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <FiFile className="text-gray-400 flex-shrink-0" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between gap-2">
+                                                <p className="text-white text-sm truncate">{fileItem.file.name}</p>
+                                                {fileItem.status === 'uploading' && (
+                                                    <span className="text-sky-400 text-xs font-mono flex-shrink-0">
+                                                        {fileItem.progress.toFixed(1)}%
+                                                    </span>
+                                                )}
                                             </div>
-                                        )}
-                                        {fileItem.status === 'error' && fileItem.error && (
-                                            <p className="text-red-400 text-xs mt-1">{fileItem.error}</p>
-                                        )}
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        {fileItem.status === 'pending' && !uploading && (
-                                            <button onClick={() => removeFile(fileItem.id)} className="text-gray-500 hover:text-red-500">
-                                                <FiX size={16} />
-                                            </button>
-                                        )}
-                                        {fileItem.status === 'uploading' && <FiLoader className="animate-spin text-sky-400" size={16} />}
-                                        {fileItem.status === 'success' && <FiCheck className="text-green-500" size={16} />}
-                                        {fileItem.status === 'error' && <FiX className="text-red-500" size={16} />}
+                                            <p className="text-gray-500 text-xs">{formatBytes(fileItem.file.size)}</p>
+
+                                            {fileItem.status === 'uploading' && (
+                                                <>
+                                                    <div className="mt-1">
+                                                        <div className="w-full bg-gray-700 rounded-full h-1">
+                                                            <div
+                                                                className="bg-sky-500 h-1 rounded-full transition-all"
+                                                                style={{ width: `${fileItem.progress}%` }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-between text-xs text-gray-400 mt-1 font-mono">
+                                                        <span>
+                                                            {formatBytes(fileItem.loaded)} / {formatBytes(fileItem.file.size)}
+                                                        </span>
+                                                        <span>
+                                                            {formatBytes(fileItem.speed || 0)}/s
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex justify-between text-xs text-gray-500 mt-0.5 font-mono">
+                                                        <span>Elapsed: {formatTime(elapsed)}</span>
+                                                        <span>
+                                                            {fileItem.progress > 0
+                                                                ? `Remaining: ~${formatTime(remaining)}`
+                                                                : 'Remaining: calculating...'}
+                                                        </span>
+                                                    </div>
+                                                </>
+                                            )}
+
+                                            {fileItem.status === 'error' && fileItem.error && (
+                                                <p className="text-red-400 text-xs mt-1">{fileItem.error}</p>
+                                            )}
+                                        </div>
+                                        <div className="flex-shrink-0">
+                                            {fileItem.status === 'pending' && !uploading && (
+                                                <button onClick={() => removeFile(fileItem.id)} className="text-gray-500 hover:text-red-500">
+                                                    <FiX size={16} />
+                                                </button>
+                                            )}
+                                            {fileItem.status === 'uploading' && <FiLoader className="animate-spin text-sky-400" size={16} />}
+                                            {fileItem.status === 'success' && <FiCheck className="text-green-500" size={16} />}
+                                            {fileItem.status === 'error' && <FiX className="text-red-500" size={16} />}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
 
@@ -287,6 +376,16 @@ const UploadItem = () => {
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
+                        {activeFile && (
+                            <div className="flex justify-between text-xs text-gray-500 mt-2 font-mono">
+                                <span>
+                                    {formatBytes(activeFile.speed || 0)}/s
+                                </span>
+                                <span>
+                                    {formatBytes(activeFile.loaded)} / {formatBytes(activeFile.file.size)}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

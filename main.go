@@ -60,9 +60,10 @@ func main() {
 	}
 
 	app := fiber.New(fiber.Config{
-		BodyLimit:             10 * 1024 * 1024, // 10 MB
+		BodyLimit:             32 * 1024 * 1024, // 32 MB
 		AppName:               "FolderHost",
 		DisableStartupMessage: true,
+		StreamRequestBody:     true,
 	})
 
 	app.Use(compress.New(compress.Config{

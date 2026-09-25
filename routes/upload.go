@@ -7,14 +7,47 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/MertJSX/folderhost/database/logs"
 	"github.com/MertJSX/folderhost/types"
-	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
+
+const (
+	chunkBufferSize   = 16 * 1024 * 1024 // 16 MB
+	expectedChunkSize = 16 * 1024 * 1024
+)
+
+func validateFileName(name string) error {
+	if name == "" {
+		return fmt.Errorf("empty file name")
+	}
+	if len(name) > 255 {
+		return fmt.Errorf("file name too long")
+	}
+	if name == "." || name == ".." {
+		return fmt.Errorf("invalid file name")
+	}
+	if strings.ContainsAny(name, "/\\") {
+		return fmt.Errorf("file name contains path separator")
+	}
+	if strings.Contains(name, "..") {
+		return fmt.Errorf("file name contains '..'")
+	}
+	return nil
+}
+
+func ensureNotExists(path string) error {
+	if _, err := os.Stat(path); err == nil {
+		return fmt.Errorf("file already exists")
+	} else if !os.IsNotExist(err) {
+		return fmt.Errorf("couldn't check file existence")
+	}
+	return nil
+}
 
 func ChunkedUpload(c *fiber.Ctx) error {
 	if !c.Locals("account").(types.Account).Permissions.UploadFiles {
@@ -43,28 +76,50 @@ func ChunkedUpload(c *fiber.Ctx) error {
 		return handleSingleFileFromMultiple(c, files[0], targetPath, scope)
 	}
 
-	fileID := c.FormValue("fileID")
 	chunkIndex := c.FormValue("chunkIndex")
 	totalChunks := c.FormValue("totalChunks")
 	fileName := c.FormValue("fileName")
-	total, _ := strconv.ParseInt(totalChunks, 10, 64)
-	currentChunk, _ := strconv.Atoi(chunkIndex)
+
+	if err := validateFileName(fileName); err != nil {
+		return c.Status(400).JSON(fiber.Map{"err": "Invalid file name: " + err.Error()})
+	}
+
+	total, err := strconv.ParseInt(totalChunks, 10, 64)
+	if err != nil || total <= 0 {
+		return c.Status(400).JSON(fiber.Map{"err": "Invalid totalChunks"})
+	}
+
+	currentChunk, err := strconv.Atoi(chunkIndex)
+	if err != nil || currentChunk < 0 || currentChunk >= int(total) {
+		return c.Status(400).JSON(fiber.Map{"err": "Invalid chunkIndex"})
+	}
+
+	scopedFolder := config.GetScopedFolder(scope)
+	finalPath := filepath.Join(scopedFolder, targetPath, fileName)
+
+	if err := os.MkdirAll(filepath.Dir(finalPath), 0755); err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create directory"})
+	}
 
 	if total == 1 {
-		file, err := form.File["file"][0].Open()
+		if err := ensureNotExists(finalPath); err != nil {
+			return c.Status(409).JSON(fiber.Map{"err": err.Error()})
+		}
+
+		chunkFile, err := form.File["file"][0].Open()
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
 		}
-		defer file.Close()
+		defer chunkFile.Close()
 
-		finalPath := filepath.Join(config.GetScopedFolder(scope), targetPath, fileName)
 		outFile, err := os.Create(finalPath)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{"err": "Couldn't create file"})
 		}
 		defer outFile.Close()
 
-		if _, err := io.Copy(outFile, file); err != nil {
+		buf := make([]byte, chunkBufferSize)
+		if _, err := io.CopyBuffer(outFile, chunkFile, buf); err != nil {
 			return c.Status(500).JSON(fiber.Map{"err": "Couldn't save file"})
 		}
 
@@ -80,44 +135,45 @@ func ChunkedUpload(c *fiber.Ctx) error {
 		})
 	}
 
-	chunkPath := filepath.Join("./tmp", fileID+"_"+chunkIndex)
+	if currentChunk == 0 {
+		if err := ensureNotExists(finalPath); err != nil {
+			return c.Status(409).JSON(fiber.Map{"err": err.Error()})
+		}
+	}
+
 	chunkFile, err := form.File["file"][0].Open()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open chunk"})
 	}
 	defer chunkFile.Close()
 
-	outFile, err := os.Create(chunkPath)
+	outFile, err := os.OpenFile(finalPath, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create chunk file"})
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open target file"})
 	}
 	defer outFile.Close()
 
-	chunkContent, _ := utils.FileToString(chunkFile)
+	chunkSizeStr := c.FormValue("chunkSize")
+	chunkSize, err := strconv.ParseInt(chunkSizeStr, 10, 64)
+	if err != nil || chunkSize <= 0 {
+		chunkSize = expectedChunkSize
+	}
+	if chunkSize != expectedChunkSize {
+		return c.Status(400).JSON(fiber.Map{"err": "Invalid chunk size"})
+	}
 
-	ch := make(chan error, 1)
-	var wg sync.WaitGroup
+	offset := int64(currentChunk) * chunkSize
+	buf := make([]byte, chunkBufferSize)
 
-	wg.Add(1)
-	go utils.CreateFileAsync(chunkPath, chunkContent, &wg, ch)
+	if _, err := outFile.Seek(offset, io.SeekStart); err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't seek to chunk offset"})
+	}
 
-	go func() {
-		wg.Wait()
-		close(ch)
-	}()
-
-	err = <-ch
-
-	if err != nil {
+	if _, err := io.CopyBuffer(outFile, chunkFile, buf); err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't save chunk"})
 	}
 
 	if currentChunk == int(total)-1 {
-		finalPath := filepath.Join(config.GetScopedFolder(scope), targetPath, fileName)
-		if err := mergeChunks(fileID, finalPath, int(total)); err != nil {
-			return c.Status(500).JSON(fiber.Map{"err": "Error uploading file"})
-		}
-
 		logs.CreateLog(types.AuditLog{
 			Username:    c.Locals("account").(types.Account).Username,
 			Action:      "Upload",
@@ -146,41 +202,67 @@ func handleMultipleUpload(c *fiber.Ctx, files []*multipart.FileHeader, targetPat
 
 	results := make([]uploadResult, len(files))
 	var wg sync.WaitGroup
+	var mu sync.Mutex
 	successCount := 0
+
+	scopedFolder := config.GetScopedFolder(scope)
+	targetDir := filepath.Join(scopedFolder, targetPath)
+
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create directory"})
+	}
 
 	for i, fileHeader := range files {
 		wg.Add(1)
 		go func(idx int, fh *multipart.FileHeader) {
 			defer wg.Done()
 
+			if err := validateFileName(fh.Filename); err != nil {
+				mu.Lock()
+				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Invalid file name: " + err.Error()}
+				mu.Unlock()
+				return
+			}
+
+			finalPath := filepath.Join(targetDir, fh.Filename)
+
+			if err := ensureNotExists(finalPath); err != nil {
+				mu.Lock()
+				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: err.Error()}
+				mu.Unlock()
+				return
+			}
+
 			file, err := fh.Open()
 			if err != nil {
+				mu.Lock()
 				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't open file"}
+				mu.Unlock()
 				return
 			}
 			defer file.Close()
 
-			finalPath := filepath.Join(config.GetScopedFolder(scope), targetPath, fh.Filename)
-
-			if err := os.MkdirAll(filepath.Dir(finalPath), 0755); err != nil {
-				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't create directory"}
-				return
-			}
-
 			outFile, err := os.Create(finalPath)
 			if err != nil {
+				mu.Lock()
 				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't create file"}
+				mu.Unlock()
 				return
 			}
 			defer outFile.Close()
 
-			if _, err := io.Copy(outFile, file); err != nil {
+			buf := make([]byte, chunkBufferSize)
+			if _, err := io.CopyBuffer(outFile, file, buf); err != nil {
+				mu.Lock()
 				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't save file"}
+				mu.Unlock()
 				return
 			}
 
+			mu.Lock()
 			results[idx] = uploadResult{FileName: fh.Filename, Status: "success"}
 			successCount++
+			mu.Unlock()
 		}(i, fileHeader)
 	}
 
@@ -207,16 +289,25 @@ func handleMultipleUpload(c *fiber.Ctx, files []*multipart.FileHeader, targetPat
 func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader, targetPath, scope string) error {
 	config := &config.Config
 
+	if err := validateFileName(fileHeader.Filename); err != nil {
+		return c.Status(400).JSON(fiber.Map{"err": "Invalid file name: " + err.Error()})
+	}
+
 	file, err := fileHeader.Open()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
 	}
 	defer file.Close()
 
-	finalPath := filepath.Join(config.GetScopedFolder(scope), targetPath, fileHeader.Filename)
+	scopedFolder := config.GetScopedFolder(scope)
+	finalPath := filepath.Join(scopedFolder, targetPath, fileHeader.Filename)
 
 	if err := os.MkdirAll(filepath.Dir(finalPath), 0755); err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create directory"})
+	}
+
+	if err := ensureNotExists(finalPath); err != nil {
+		return c.Status(409).JSON(fiber.Map{"err": err.Error()})
 	}
 
 	outFile, err := os.Create(finalPath)
@@ -225,7 +316,8 @@ func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader
 	}
 	defer outFile.Close()
 
-	if _, err := io.Copy(outFile, file); err != nil {
+	buf := make([]byte, chunkBufferSize)
+	if _, err := io.CopyBuffer(outFile, file, buf); err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't save file"})
 	}
 
@@ -239,28 +331,4 @@ func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader
 		"response": "Successfully uploaded!",
 		"uploaded": true,
 	})
-}
-
-func mergeChunks(fileID, outputPath string, totalChunks int) error {
-	outFile, err := os.Create(outputPath)
-	if err != nil {
-		return err
-	}
-	defer outFile.Close()
-
-	for i := 0; i < totalChunks; i++ {
-		chunkPath := filepath.Join("./tmp", fmt.Sprintf("%s_%d", fileID, i))
-		chunkData, err := os.Open(chunkPath)
-		if err != nil {
-			return fmt.Errorf("couldn't find chunk %d: %v", i, err)
-		}
-
-		if _, err := io.Copy(outFile, chunkData); err != nil {
-			chunkData.Close()
-			return fmt.Errorf("couldn't write chunk %d: %v", i, err)
-		}
-		chunkData.Close()
-		os.Remove(chunkPath)
-	}
-	return nil
 }
