@@ -96,9 +96,9 @@ const NewUser = () => {
   return (
     <div>
       <MessageBox message={error !== "" ? error : ""} isErr={error !== ""} setMessage={setError} />
-      <section className="my-10 flex flex-col bg-gray-800 gap-6 w-4/5 mx-auto p-6 max-w-[1000px] min-h-[600px] shadow-2xl rounded-lg">
+      <section className="my-10 flex flex-col bg-gray-800 gap-6 md:w-4/5 mx-auto p-6 max-w-[1000px] min-h-[600px] shadow-2xl rounded-lg">
         <div className="flex justify-between items-center">
-          <h1 className="flex text-3xl items-center gap-3 text-white font-semibold">
+          <h1 className="flex text-xl 2xl:text-2xl items-center gap-3 text-white font-semibold">
             <FaUserPlus className="text-blue-400" /> New User
           </h1>
           <Link
@@ -115,7 +115,7 @@ const NewUser = () => {
           {/* Basic Information */}
           <div className="space-y-4">
             <h2 className="text-xl text-white font-semibold">Basic Information</h2>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 text-base">
               <input
                 type="text"
                 placeholder="Username (Required)"
@@ -155,14 +155,14 @@ const NewUser = () => {
                 onClick={() => {
                   enableAllPermissions()
                 }}
-                className="text-lg bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
+                className="text-base bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
                 Give all
               </button>
               <button
                 onClick={() => {
                   disableAllPermissions()
                 }}
-                className="text-lg bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
+                className="text-base bg-gray-700 hover:bg-gray-600 p-2 px-10 rounded-lg">
                 Take all
               </button>
 
@@ -170,14 +170,16 @@ const NewUser = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-lg">
               {/* Read & View Access */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaEye size={iconSize} />Read & View Access</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaEye size={iconSize} />Read & View Access</h3>
                 <PermissionToggle
                   label="Read Directories"
+                  info="Allows the user to view folders and their contents."
                   checked={user.permissions.read_directories}
                   onChange={(checked) => handlePermissionChange('read_directories', checked)}
                 />
                 <PermissionToggle
                   label="Read Files"
+                  info="Allows the user to view and open files."
                   checked={user.permissions.read_files}
                   onChange={(checked) => handlePermissionChange('read_files', checked)}
                 />
@@ -185,14 +187,16 @@ const NewUser = () => {
 
               {/* File Transfer */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaDownload size={iconSize} />File Transfer</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaDownload size={iconSize} />File Transfer</h3>
                 <PermissionToggle
                   label="Download Files"
+                  info="Allows the user to download files and create public shared links."
                   checked={user.permissions.download_files}
                   onChange={(checked) => handlePermissionChange('download_files', checked)}
                 />
                 <PermissionToggle
                   label="Upload Files"
+                  info="Allows the user to upload new files to the server."
                   checked={user.permissions.upload_files}
                   onChange={(checked) => handlePermissionChange('upload_files', checked)}
                 />
@@ -200,24 +204,28 @@ const NewUser = () => {
 
               {/* Content Modification */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaPen size={iconSize} />Content Modification</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaPen size={iconSize} />Content Modification</h3>
                 <PermissionToggle
                   label="Create Items"
+                  info="Allows the user to create new folders and text files."
                   checked={user.permissions.create}
                   onChange={(checked) => handlePermissionChange('create', checked)}
                 />
                 <PermissionToggle
                   label="Change Files"
+                  info="Allows the user to edit the contents of existing text files."
                   checked={user.permissions.change}
                   onChange={(checked) => handlePermissionChange('change', checked)}
                 />
                 <PermissionToggle
                   label="Rename Items"
+                  info="Allows the user to rename files and folders."
                   checked={user.permissions.rename}
                   onChange={(checked) => handlePermissionChange('rename', checked)}
                 />
                 <PermissionToggle
                   label="Delete Items"
+                  info="Allows the user to move files and folders to the recovery bin."
                   checked={user.permissions.delete}
                   onChange={(checked) => handlePermissionChange('delete', checked)}
                 />
@@ -225,24 +233,28 @@ const NewUser = () => {
 
               {/* File Organization */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaFile size={iconSize} />File Organization</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaFile size={iconSize} />File Organization</h3>
                 <PermissionToggle
                   label="Move Items"
+                  info="Allows the user to move files and folders."
                   checked={user.permissions.move}
                   onChange={(checked) => handlePermissionChange('move', checked)}
                 />
                 <PermissionToggle
                   label="Copy Items"
+                  info="Allows the user to duplicate files and folders."
                   checked={user.permissions.copy}
                   onChange={(checked) => handlePermissionChange('copy', checked)}
                 />
                 <PermissionToggle
                   label="Extract Archives"
+                  info="Allows the user to extract contents from ZIP or tar.gz files."
                   checked={user.permissions.extract}
                   onChange={(checked) => handlePermissionChange('extract', checked)}
                 />
                 <PermissionToggle
                   label="Archive Folders"
+                  info="Allows the user to compress folders into ZIP archives."
                   checked={user.permissions.archive}
                   onChange={(checked) => handlePermissionChange('archive', checked)}
                 />
@@ -250,14 +262,16 @@ const NewUser = () => {
 
               {/* Recovery Management */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaArrowRotateLeft size={iconSize} />Recovery Management</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaArrowRotateLeft size={iconSize} />Recovery Management</h3>
                 <PermissionToggle
                   label="Read Recovery"
+                  info="Allows the user to view the recovery bin contents."
                   checked={user.permissions.read_recovery}
                   onChange={(checked) => handlePermissionChange('read_recovery', checked)}
                 />
                 <PermissionToggle
                   label="Use Recovery"
+                  info="Allows the user to restore or permanently delete items from the recovery bin."
                   checked={user.permissions.use_recovery}
                   onChange={(checked) => handlePermissionChange('use_recovery', checked)}
                 />
@@ -265,19 +279,22 @@ const NewUser = () => {
 
               {/* Administration */}
               <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-lg text-gray-300 font-medium"><FaShieldAlt />Administration</h3>
+                <h3 className="flex items-center gap-2 text-base text-gray-300 font-medium"><FaShieldAlt />Administration</h3>
                 <PermissionToggle
                   label="Read Users"
+                  info="Allows the user to view the list of registered users."
                   checked={user.permissions.read_users}
                   onChange={(checked) => handlePermissionChange('read_users', checked)}
                 />
                 <PermissionToggle
                   label="Edit Users"
+                  info="Allows the user to modify permissions, delete accounts, and manage user shared links."
                   checked={user.permissions.edit_users}
                   onChange={(checked) => handlePermissionChange('edit_users', checked)}
                 />
                 <PermissionToggle
                   label="Read Logs"
+                  info="Allows the user to view the system audit logs."
                   checked={user.permissions.read_logs}
                   onChange={(checked) => handlePermissionChange('read_logs', checked)}
                 />
@@ -287,11 +304,11 @@ const NewUser = () => {
         </section>
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-4 border-t border-gray-600">
+        <div className="flex justify-center gap-2 pt-4 border-t border-gray-600">
           <button
             onClick={handleSubmit}
             disabled={!user.username || !user.password}
-            className="bg-green-600 hover:bg-green-500 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 w-full"
+            className="bg-green-700 hover:bg-green-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 w-2/3"
           >
             Create User
           </button>
