@@ -292,16 +292,16 @@ const FileExplorer: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-col bg-gray-800 gap-1 overflow-auto rounded-xl shadow-2xl w-full md:w-3/5 mx-auto max-w-6xl min-h-[500px] max-h-[500px] 2xl:min-h-[700px] h-[700px] 2xl:max-h-[800px] p-4 md:p-8 lg:p-2 2xl:p-8'>
+    <div className='flex flex-col bg-gray-800 gap-1 overflow-auto rounded-xl shadow-2xl w-full md:w-3/5 mx-auto max-w-6xl min-h-[500px] max-h-[500px] xl:min-h-[80vh] 2xl:min-h-[700px] h-[700px] 2xl:max-h-[800px] p-4 md:p-8 lg:p-2 xl:p-4 2xl:p-8'>
       {/* Header Section */}
       <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4'>
         <div className="flex items-center gap-3">
-          <div className="p-2 2xl:p-3 bg-sky-500 rounded-lg">
+          <div className="p-2 bg-sky-500 rounded-lg">
             <MdExplore size={24} className="text-white" />
           </div>
           <div>
-            <h1 className='text-xl 2xl:text-2xl font-bold text-white'>File Explorer</h1>
-            <p className='text-gray-400 text-sm 2xl:text-base'>Browse and manage your files</p>
+            <h1 className='text-xl font-bold text-white'>File Explorer</h1>
+            <p className='text-gray-400 text-sm'>Browse and manage your files</p>
           </div>
         </div>
 
@@ -355,12 +355,12 @@ const FileExplorer: React.FC = () => {
 
           {directoryInfo && (
             <button
-              className='flex items-center gap-2 p-2 md:p-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
+              className='flex items-center gap-2 p-2 2xl:p-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
               onClick={() => setItemInfo(directoryInfo)}
               title="Current folder info"
             >
               <FaFolderOpen size={18} />
-              <span className="max-w-[120px] md:max-w-[200px] truncate">{directoryInfo.name}</span>
+              <span className="text-sm max-w-[120px] md:max-w-[200px] truncate">{directoryInfo.name}</span>
             </button>
           )}
 
@@ -550,7 +550,7 @@ const FileExplorer: React.FC = () => {
                     <DirectoryItemIcon itemInfo={element} logoSize={22} />
                   </div>
                   <div className="col-span-5">
-                    <div className="text-white font-medium group-hover:text-cyan-200 transition-colors truncate">
+                    <div className="text-white text-sm font-medium group-hover:text-cyan-200 transition-colors truncate">
                       {element.name}
                     </div>
                   </div>
