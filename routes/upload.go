@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 
 	"github.com/MertJSX/folderhost/database/logs"
 	"github.com/MertJSX/folderhost/types"
@@ -20,6 +21,15 @@ const (
 	chunkBufferSize   = 16 * 1024 * 1024 // 16 MB
 	expectedChunkSize = 16 * 1024 * 1024
 )
+
+type uploadState struct {
+	once     *sync.Once
+	failed   atomic.Bool
+	received atomic.Int32
+	total    int32
+}
+
+var uploadStates sync.Map // fileID -> *uploadState
 
 func validateFileName(name string) error {
 	if name == "" {
@@ -40,13 +50,36 @@ func validateFileName(name string) error {
 	return nil
 }
 
-func ensureNotExists(path string) error {
-	if _, err := os.Stat(path); err == nil {
-		return fmt.Errorf("file already exists")
-	} else if !os.IsNotExist(err) {
-		return fmt.Errorf("couldn't check file existence")
+func checkOnce(fileID, finalPath string, total int32) bool {
+	actual, _ := uploadStates.LoadOrStore(fileID, &uploadState{
+		once:  &sync.Once{},
+		total: total,
+	})
+	state := actual.(*uploadState)
+
+	state.once.Do(func() {
+		f, err := os.OpenFile(finalPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+		if err != nil {
+			state.failed.Store(true)
+			return
+		}
+		f.Close()
+		state.failed.Store(false)
+	})
+
+	return state.failed.Load()
+}
+
+func markReceived(fileID string) {
+	val, ok := uploadStates.Load(fileID)
+	if !ok {
+		return
 	}
-	return nil
+	state := val.(*uploadState)
+	n := state.received.Add(1)
+	if n == state.total {
+		uploadStates.Delete(fileID)
+	}
 }
 
 func ChunkedUpload(c *fiber.Ctx) error {
@@ -79,6 +112,7 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	chunkIndex := c.FormValue("chunkIndex")
 	totalChunks := c.FormValue("totalChunks")
 	fileName := c.FormValue("fileName")
+	fileID := c.FormValue("fileID")
 
 	if err := validateFileName(fileName); err != nil {
 		return c.Status(400).JSON(fiber.Map{"err": "Invalid file name: " + err.Error()})
@@ -102,24 +136,25 @@ func ChunkedUpload(c *fiber.Ctx) error {
 	}
 
 	if total == 1 {
-		if err := ensureNotExists(finalPath); err != nil {
-			return c.Status(409).JSON(fiber.Map{"err": err.Error()})
-		}
-
-		chunkFile, err := form.File["file"][0].Open()
+		outFile, err := os.OpenFile(finalPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
 		if err != nil {
-			return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
-		}
-		defer chunkFile.Close()
-
-		outFile, err := os.Create(finalPath)
-		if err != nil {
+			if os.IsExist(err) {
+				return c.Status(409).JSON(fiber.Map{"err": "File already exists"})
+			}
 			return c.Status(500).JSON(fiber.Map{"err": "Couldn't create file"})
 		}
 		defer outFile.Close()
 
+		chunkFile, err := form.File["file"][0].Open()
+		if err != nil {
+			os.Remove(finalPath)
+			return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
+		}
+		defer chunkFile.Close()
+
 		buf := make([]byte, chunkBufferSize)
 		if _, err := io.CopyBuffer(outFile, chunkFile, buf); err != nil {
+			os.Remove(finalPath)
 			return c.Status(500).JSON(fiber.Map{"err": "Couldn't save file"})
 		}
 
@@ -129,29 +164,35 @@ func ChunkedUpload(c *fiber.Ctx) error {
 			Description: fmt.Sprintf("%s uploaded a %s file.", c.Locals("account").(types.Account).Username, fileName),
 		})
 
-		return c.JSON(fiber.Map{
-			"response": "Successfully uploaded!",
-			"uploaded": true,
-		})
+		return c.JSON(fiber.Map{"response": "Successfully uploaded!", "uploaded": true})
 	}
 
-	if currentChunk == 0 {
-		if err := ensureNotExists(finalPath); err != nil {
-			return c.Status(409).JSON(fiber.Map{"err": err.Error()})
-		}
+	// ---- ÇOK CHUNK'LI ----
+	if fileID == "" {
+		return c.Status(400).JSON(fiber.Map{"err": "Missing fileID"})
 	}
+
+	// İlk gelen chunk kontrolü yapar, diğerleri bekler.
+	failed := checkOnce(fileID, finalPath, int32(total))
+
+	// Her chunk geldiğinde sayacı artır (başarılı veya değil).
+	defer markReceived(fileID)
+
+	if failed {
+		return c.Status(409).JSON(fiber.Map{"err": "File already exists"})
+	}
+
+	outFile, err := os.OpenFile(finalPath, os.O_WRONLY, 0644)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
+	}
+	defer outFile.Close()
 
 	chunkFile, err := form.File["file"][0].Open()
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open chunk"})
 	}
 	defer chunkFile.Close()
-
-	outFile, err := os.OpenFile(finalPath, os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open target file"})
-	}
-	defer outFile.Close()
 
 	chunkSizeStr := c.FormValue("chunkSize")
 	chunkSize, err := strconv.ParseInt(chunkSizeStr, 10, 64)
@@ -180,15 +221,10 @@ func ChunkedUpload(c *fiber.Ctx) error {
 			Description: fmt.Sprintf("%s uploaded a %s file.", c.Locals("account").(types.Account).Username, fileName),
 		})
 
-		return c.JSON(fiber.Map{
-			"response": "Successfully uploaded!",
-			"uploaded": true,
-		})
+		return c.JSON(fiber.Map{"response": "Successfully uploaded!", "uploaded": true})
 	}
 
-	return c.JSON(fiber.Map{
-		"response": fmt.Sprintf("Uploaded chunk %s", chunkIndex),
-	})
+	return c.JSON(fiber.Map{"response": fmt.Sprintf("Uploaded chunk %d", currentChunk)})
 }
 
 func handleMultipleUpload(c *fiber.Ctx, files []*multipart.FileHeader, targetPath, scope string) error {
@@ -226,15 +262,22 @@ func handleMultipleUpload(c *fiber.Ctx, files []*multipart.FileHeader, targetPat
 
 			finalPath := filepath.Join(targetDir, fh.Filename)
 
-			if err := ensureNotExists(finalPath); err != nil {
+			outFile, err := os.OpenFile(finalPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
+			if err != nil {
 				mu.Lock()
-				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: err.Error()}
+				if os.IsExist(err) {
+					results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "File already exists"}
+				} else {
+					results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't create file"}
+				}
 				mu.Unlock()
 				return
 			}
+			defer outFile.Close()
 
 			file, err := fh.Open()
 			if err != nil {
+				os.Remove(finalPath)
 				mu.Lock()
 				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't open file"}
 				mu.Unlock()
@@ -242,17 +285,9 @@ func handleMultipleUpload(c *fiber.Ctx, files []*multipart.FileHeader, targetPat
 			}
 			defer file.Close()
 
-			outFile, err := os.Create(finalPath)
-			if err != nil {
-				mu.Lock()
-				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't create file"}
-				mu.Unlock()
-				return
-			}
-			defer outFile.Close()
-
 			buf := make([]byte, chunkBufferSize)
 			if _, err := io.CopyBuffer(outFile, file, buf); err != nil {
+				os.Remove(finalPath)
 				mu.Lock()
 				results[idx] = uploadResult{FileName: fh.Filename, Status: "failed", Error: "Couldn't save file"}
 				mu.Unlock()
@@ -293,12 +328,6 @@ func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader
 		return c.Status(400).JSON(fiber.Map{"err": "Invalid file name: " + err.Error()})
 	}
 
-	file, err := fileHeader.Open()
-	if err != nil {
-		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
-	}
-	defer file.Close()
-
 	scopedFolder := config.GetScopedFolder(scope)
 	finalPath := filepath.Join(scopedFolder, targetPath, fileHeader.Filename)
 
@@ -306,18 +335,25 @@ func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create directory"})
 	}
 
-	if err := ensureNotExists(finalPath); err != nil {
-		return c.Status(409).JSON(fiber.Map{"err": err.Error()})
-	}
-
-	outFile, err := os.Create(finalPath)
+	outFile, err := os.OpenFile(finalPath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0644)
 	if err != nil {
+		if os.IsExist(err) {
+			return c.Status(409).JSON(fiber.Map{"err": "File already exists"})
+		}
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't create file"})
 	}
 	defer outFile.Close()
 
+	file, err := fileHeader.Open()
+	if err != nil {
+		os.Remove(finalPath)
+		return c.Status(500).JSON(fiber.Map{"err": "Couldn't open file"})
+	}
+	defer file.Close()
+
 	buf := make([]byte, chunkBufferSize)
 	if _, err := io.CopyBuffer(outFile, file, buf); err != nil {
+		os.Remove(finalPath)
 		return c.Status(500).JSON(fiber.Map{"err": "Couldn't save file"})
 	}
 
@@ -327,8 +363,5 @@ func handleSingleFileFromMultiple(c *fiber.Ctx, fileHeader *multipart.FileHeader
 		Description: fmt.Sprintf("%s uploaded a %s file.", c.Locals("account").(types.Account).Username, fileHeader.Filename),
 	})
 
-	return c.JSON(fiber.Map{
-		"response": "Successfully uploaded!",
-		"uploaded": true,
-	})
+	return c.JSON(fiber.Map{"response": "Successfully uploaded!", "uploaded": true})
 }
