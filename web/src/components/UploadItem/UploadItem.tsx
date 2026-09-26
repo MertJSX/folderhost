@@ -4,24 +4,11 @@ import ExplorerContext from '../../utils/ExplorerContext';
 import axiosInstance from '../../utils/axiosInstance';
 import type { AxiosError } from 'axios';
 import {type FileItem} from '../../types/FileItem';
+import convertBytesToString from '../../utils/convertBytesToString';
+import moment from 'moment';
 
 const CHUNK_SIZE = 16 * 1024 * 1024;
 const PARALLEL_CHUNKS = 3;
-
-const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-};
-
-const formatTime = (seconds: number) => {
-    if (!isFinite(seconds) || seconds < 0) return '--:--';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-};
 
 const UploadItem = () => {
     const { path, setShowUploadMenu, readDir } = useContext(ExplorerContext);
@@ -178,7 +165,7 @@ const UploadItem = () => {
             <div className="bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 p-6">
                 {/* Header */}
                 <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
-                    <h2 className="text-2xl font-bold text-sky-300">Upload Files</h2>
+                    <h2 className="text-xl font-bold text-sky-300">Upload Files</h2>
                     <button
                         onClick={() => {
                             if (!uploading) {
@@ -287,7 +274,7 @@ const UploadItem = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-gray-500 text-xs">{formatBytes(fileItem.file.size)}</p>
+                                            <p className="text-gray-500 text-xs">{convertBytesToString(fileItem.file.size)}</p>
 
                                             {fileItem.status === 'uploading' && (
                                                 <>
@@ -301,18 +288,18 @@ const UploadItem = () => {
                                                     </div>
                                                     <div className="flex justify-between text-xs text-gray-400 mt-1 font-mono">
                                                         <span>
-                                                            {formatBytes(fileItem.loaded)} / {formatBytes(fileItem.file.size)}
+                                                            {convertBytesToString(fileItem.loaded)} / {convertBytesToString(fileItem.file.size)}
                                                         </span>
                                                         <span>
-                                                            {formatBytes(fileItem.speed || 0)}/s
+                                                            {convertBytesToString(fileItem.speed || 0)}/s
                                                         </span>
                                                     </div>
 
                                                     <div className="flex justify-between text-xs text-gray-500 mt-0.5 font-mono">
-                                                        <span>Elapsed: {formatTime(elapsed)}</span>
+                                                        <span>Elapsed: {moment.utc(elapsed * 1000).format('m:ss')}</span>
                                                         <span>
                                                             {fileItem.progress > 0
-                                                                ? `Remaining: ~${formatTime(remaining)}`
+                                                                ? `Remaining: ~${moment.utc(remaining * 1000).format('m:ss')}`
                                                                 : 'Remaining: calculating...'}
                                                         </span>
                                                     </div>
@@ -379,10 +366,10 @@ const UploadItem = () => {
                         {activeFile && (
                             <div className="flex justify-between text-xs text-gray-500 mt-2 font-mono">
                                 <span>
-                                    {formatBytes(activeFile.speed || 0)}/s
+                                    {convertBytesToString(activeFile.speed || 0)}/s
                                 </span>
                                 <span>
-                                    {formatBytes(activeFile.loaded)} / {formatBytes(activeFile.file.size)}
+                                    {convertBytesToString(activeFile.loaded)} / {convertBytesToString(activeFile.file.size)}
                                 </span>
                             </div>
                         )}
