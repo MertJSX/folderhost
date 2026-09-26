@@ -96,7 +96,7 @@ const ItemInfo = () => {
               )}
 
               {!imageLoading && !imageError && imageData && (
-                <div 
+                <div
                   className="relative group cursor-pointer"
                   onClick={() => setShowFileViewer(true)}
                   title="Click to view image"
@@ -195,15 +195,20 @@ const ItemInfo = () => {
             {
               permissions?.delete ?
                 <button
-                  className='bg-red-600 px-6 font-bold rounded-xl'
-                  title='Click to delete.'
+                  className='bg-red-600 px-6 font-bold rounded-xl relative'
+                  title='Click to delete. (Shortcut: Delete)'
                   onClick={() => {
                     if (!window.confirm("Are you sure you want to delete this file?")) {
                       return;
                     }
                     deleteItem(itemInfo)
                   }}
-                >Delete file</button> : showDisabled === true ?
+                >
+                  Delete file
+                  <span className='hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 items-center justify-center px-2 py-0.5 bg-black/30 rounded text-xs font-mono'>
+                    Del
+                  </span>
+                </button> : showDisabled === true ?
                   <button
                     className='bg-red-600 px-6 font-bold rounded-xl opacity-50'
                     title='No permission!'
@@ -281,13 +286,21 @@ const ItemInfo = () => {
                   >Open in Code Editor</button> : null
 
             }
-            <button
-              className='bg-sky-500 px-6 font-bold rounded-xl'
-              title='Click to share file.'
-              onClick={() => {
-                setShowShareModal(true)
-              }}
-            >Share</button>
+            {
+              permissions?.download_files ?
+                <button
+                  className='bg-sky-500 px-6 font-bold rounded-xl'
+                  title='Click to share file.'
+                  onClick={() => {
+                    setShowShareModal(true)
+                  }}
+                >Share</button> : showDisabled === true ?
+                  <button
+                    className='bg-sky-500 px-6 font-bold rounded-xl opacity-50'
+                    title='No permission!'
+                    disabled
+                  >Share</button> : null
+            }
           </div>
         ) :
           <div className="flex flex-col gap-2 w-5/6">
