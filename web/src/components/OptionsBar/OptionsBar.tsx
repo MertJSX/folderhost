@@ -21,7 +21,7 @@ const OptionsBar = () => {
                 <input
                     type="text"
                     spellCheck={false}
-                    className='w-full sm:w-1/2 bg-slate-700 text-base min-w-[300px] font-bold font-sans rounded-t-lg rounded-l-lg rounded-b-lg md:rounded-r-none md:rounded-tr-none px-2 md:py-0'
+                    className='w-full sm:w-1/2 bg-slate-700 text-sm min-w-[300px] font-bold font-sans rounded-t-lg rounded-l-lg rounded-b-lg md:rounded-r-none md:rounded-tr-none px-2 md:py-0'
                     placeholder='Path'
                     value={path}
                     onKeyDown={(e) => {
