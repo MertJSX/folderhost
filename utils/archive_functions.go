@@ -10,6 +10,12 @@ import (
 	"runtime"
 )
 
+func removeUnsuccessfulExtraction(extractedPaths []string) {
+	for i := len(extractedPaths) - 1; i >= 0; i-- {
+		os.RemoveAll(extractedPaths[i])
+	}
+}
+
 func Unzip(src, dest string, cb func(int64, bool, string)) error {
 	r, err := zip.OpenReader(src)
 	if err != nil {
@@ -23,6 +29,7 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 		currentGID int   = os.Getgid()
 	)
 
+	var extractedPaths []string
 	remainingFolderSpace, err := GetRemainingFolderSpace()
 
 	if err != nil {
@@ -31,17 +38,35 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 
 	for _, file := range r.File {
 		cb(totalSize, false, "") // Parameters: totalSize, isCompleted, abortMsg
+
+		filePath := filepath.Join(dest, file.Name)
+
+		if !IsSafePath(filePath) {
+			return fmt.Errorf("security risk: wrong filepath")
+		}
+
+		itemInfo, statErr := os.Stat(filePath)
+		wasExisting := statErr == nil
+
+		if wasExisting && !itemInfo.IsDir() && !file.FileInfo().IsDir() {
+			removeUnsuccessfulExtraction(extractedPaths)
+			return fmt.Errorf("unable to extract file (%s): file already exists in current directory that you're extracting to", file.Name)
+		}
+
+		// Only track newly created paths (not pre-existing ones)
+		// This way, if extraction fails, we don't delete the user's original files
+		if !wasExisting {
+			extractedPaths = append(extractedPaths, filePath)
+		}
+
 		err := extractFile(file, dest, &totalSize, currentUID, currentGID)
 		if err != nil {
+			removeUnsuccessfulExtraction(extractedPaths)
 			log.Printf("Unzip error: %v\n", err)
 			return fmt.Errorf("unable to extract file (%s): %v", file.Name, err)
 		}
 		if totalSize > remainingFolderSpace {
-			err := os.RemoveAll(dest)
-			if err != nil {
-				cb(totalSize, false, "Unzip process exceeds storage limit! Error while deleting the extracted folder.")
-				return fmt.Errorf("unzip process exceeds storage limit")
-			}
+			removeUnsuccessfulExtraction(extractedPaths)
 			cb(totalSize, false, "Unzip process exceeds storage limit!")
 			return fmt.Errorf("unzip process exceeds storage limit")
 		}
