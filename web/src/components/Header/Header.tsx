@@ -40,9 +40,14 @@ const Header = () => {
     }
 
     const getNavLinkClass = (path: string) => {
-        const baseClasses = 'text-base flex items-center gap-2 px-5 py-3 transition-all border-b-2';
+        const baseClasses =
+            'flex items-center gap-1.5 lg:gap-2 ' +
+            'px-2.5 py-2 lg:px-3.5 lg:py-2.5 xl:px-5 xl:py-3 ' +
+            'text-sm lg:text-[15px] xl:text-sm 2xl:text-base ' +
+            'transition-all border-b-2 whitespace-nowrap';
         const activeClasses = 'text-sky-400 border-sky-500';
-        const inactiveClasses = 'text-white border-transparent hover:bg-slate-700 hover:text-sky-400 hover:border-sky-500';
+        const inactiveClasses =
+            'text-white border-transparent hover:bg-slate-700 hover:text-sky-400 hover:border-sky-500';
 
         return `${baseClasses} ${isActiveLink(path) ? activeClasses : inactiveClasses}`;
     }
@@ -52,50 +57,50 @@ const Header = () => {
     }
 
     return (
-        <div className='flex flex-col items-center justify-center bg-slate-800 pt-3 sticky left-0 right-0 top-0 w-full border-b-2 border-slate-700 shadow-lg z-50'>
+        <div className='flex flex-col items-center justify-center bg-slate-800 2xl:pt-1 sticky left-0 right-0 top-0 w-full border-b-2 border-slate-700 shadow-lg z-50'>
             {/* Desktop Header */}
             <section className='hidden md:flex flex-row items-center justify-between w-full px-6'>
                 {/* Logo Section */}
-                <div className="flex items-center gap-3 mb-3">
-                    <img src={fullLogo} width={200} alt='' />
+                <div className="flex items-center gap-3 2xl:mb-1">
+                    <img src={fullLogo} width={180} alt='' />
                 </div>
 
                 {/* Desktop Navigation */}
-                <nav className='hidden md:flex flex-row justify-center items-center gap-1 h-full'>
+                <nav className='hidden md:flex flex-row justify-center items-center gap-0.5 lg:gap-1 h-full'>
                     <Link
                         className={getNavLinkClass('/explorer')}
                         to={"/explorer/.%2F"}>
-                        <MdExplore className="w-5 h-5" />
+                        <MdExplore className="w-4 h-4 lg:w-[18px] lg:h-[18px] xl:w-5 xl:h-5" />
                         Explorer
                     </Link>
                     <Link
                         className={getNavLinkClass('/services')}
                         to={"/services"}>
-                        <MdMiscellaneousServices className="w-5 h-5" />
+                        <MdMiscellaneousServices className="w-4 h-4 lg:w-[18px] lg:h-[18px] xl:w-5 xl:h-5" />
                         Services
                     </Link>
                     <Link
                         className={getNavLinkClass('/recovery')}
                         to={"/recovery"}>
-                        <FaArrowRotateLeft className="w-4 h-4" />
+                        <FaArrowRotateLeft className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />
                         Recovery
                     </Link>
                     <Link
                         className={getNavLinkClass('/users')}
                         to={"/users"}>
-                        <FaUserFriends className="w-5 h-5" />
+                        <FaUserFriends className="w-4 h-4 lg:w-[18px] lg:h-[18px] xl:w-5 xl:h-5" />
                         Users
                     </Link>
                     <Link
                         className={getNavLinkClass('/logs')}
                         to={"/logs"}>
-                        <FaPencilAlt className="w-4 h-4" />
+                        <FaPencilAlt className="w-3.5 h-3.5 lg:w-4 lg:h-4 xl:w-4 xl:h-4" />
                         Logs
                     </Link>
                 </nav>
 
                 {/* User Info and Logout Section */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 lg:gap-3 xl:gap-4 shrink-0">
                     <UserMenu username={username} />
                 </div>
             </section>
@@ -123,8 +128,6 @@ const Header = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Desktop Navigation moved to top */}
 
             {/* Mobile Navigation Menu */}
             {isMobileMenuOpen && (
@@ -172,4 +175,4 @@ const Header = () => {
     )
 }
 
-export default Header
+export default Header;

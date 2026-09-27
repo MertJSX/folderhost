@@ -103,12 +103,12 @@ const Logs: React.FC = () => {
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-sky-500 rounded-lg">
+                        <div className="p-2 2xl:p-3 bg-sky-500 rounded-lg">
                             <FaPencilAlt size={28} className="text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold text-white">Audit Logs</h1>
-                            <p className="text-gray-400">System activity and user actions</p>
+                            <h1 className="text-xl 2xl:text-2xl font-bold text-white">Audit Logs</h1>
+                            <p className="text-sm 2xl:text-base text-gray-400">System activity and user actions</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -119,11 +119,11 @@ const Logs: React.FC = () => {
                 </div>
 
                 {/* Action Buttons and Filters */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 text-sm">
                     <div className="flex gap-3 flex-1">
                         <button
                             onClick={() => getLogs(true)}
-                            className="flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded transition-colors flex-1"
+                            className="flex items-center justify-center gap-2 bg-sky-700 hover:bg-sky-600 text-white font-semibold py-1 px-4 rounded transition-colors flex-1"
                             title="Refresh logs"
                         >
                             <FaSync className={`text-sm ${isLoading ? "animate-spin-once" : ""}`} />
@@ -138,7 +138,7 @@ const Logs: React.FC = () => {
                             <select
                                 value={usernameFilter}
                                 onChange={(e) => setUsernameFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
+                                className="w-full h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             >
                                 <option value="">All Users</option>
                                 {uniqueUsernames.map(username => (
@@ -155,7 +155,7 @@ const Logs: React.FC = () => {
                                 type="date"
                                 value={dateFilter}
                                 onChange={(e) => setDateFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
+                                className="w-full h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             />
                         </div>
 
@@ -178,9 +178,9 @@ const Logs: React.FC = () => {
                 <hr className="border-gray-600" />
 
                 {/* Logs List */}
-                <section className="flex flex-col gap-3 overflow-y-auto flex-1 pr-2">
+                <section className="flex flex-col gap-1 overflow-y-auto flex-1 pr-2">
                     {/* Table Header */}
-                    <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-900 sticky top-0 left-0 right-0">
+                    <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-900 sticky top-0 left-0 right-0 text-sm">
                         <div className="col-span-2 text-gray-300 font-semibold">User</div>
                         <div className="col-span-2 text-gray-300 font-semibold">Action</div>
                         <div className="col-span-6 text-gray-300 font-semibold">Description</div>
@@ -191,7 +191,7 @@ const Logs: React.FC = () => {
                         filteredLogs.map((log, index) => (
                             <article
                                 key={log.id || index}
-                                className="grid grid-cols-12 gap-4 items-center p-4 bg-gray-700 rounded-lg border border-gray-600 hover:border-sky-400 transition-all"
+                                className="grid grid-cols-12 gap-4 items-center p-1 bg-gray-700 rounded-lg border border-gray-600 hover:border-sky-400 transition-all px-3"
                             >
                                 <div className="col-span-2">
                                     <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ const Logs: React.FC = () => {
                                     <div className="text-gray-400 text-sm">
                                         {moment(log.created_at).format("MMM DD")}
                                     </div>
-                                    <div className="text-gray-500 text-xs">
+                                    <div className="text-gray-300 text-xs">
                                         {moment(log.created_at).format("HH:mm")}
                                     </div>
                                 </div>

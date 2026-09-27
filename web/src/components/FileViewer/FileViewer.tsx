@@ -152,9 +152,10 @@ const FileViewer = ({ filePath, onClose }: FileViewerProps) => {
       return (
         <embed
           key={directUrl}
-          src={directUrl}
+          src={directUrl + `#toolbar=1&navpanes=1&scrollbar=0&_t=${Date.now()}`}
           type="application/pdf"
-          className="flex-1 w-full rounded-lg border border-gray-600 bg-gray-900"
+          title={fileName}
+          className="flex-1 w-full border border-gray-600 bg-gray-900"
           style={{ minHeight: 0 }}
         />
       );
@@ -225,12 +226,12 @@ const FileViewer = ({ filePath, onClose }: FileViewerProps) => {
       onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
     >
       <div
-        className="flex flex-col bg-gray-800 rounded-xl shadow-2xl w-full max-w-5xl mx-auto"
-        style={{ height: '90vh', maxHeight: '1000px' }}
+        className="flex flex-col bg-gray-800 rounded-xl shadow-2xl w-full max-w-[100vw] mx-auto"
+        style={{ height: '95vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-600 flex-shrink-0">
+        <div className="flex items-center justify-between px-6 py-2 border-b border-gray-600 flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0">
             <div className="p-2 bg-sky-500 rounded-lg flex-shrink-0">
               <MdFilePresent size={20} className="text-white" />
@@ -253,7 +254,7 @@ const FileViewer = ({ filePath, onClose }: FileViewerProps) => {
         </div>
 
         {/* Content */}
-        <div className="flex flex-col flex-1 p-4 gap-4 overflow-hidden">
+        <div className="flex flex-col flex-1 p-0 gap-4 overflow-hidden">
           {renderContent()}
         </div>
       </div>
