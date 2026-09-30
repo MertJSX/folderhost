@@ -48,7 +48,8 @@ var (
 )
 
 func main() {
-	if Version == "unknown" {
+	fmt.Printf("Version is: %s\n", Version)
+	if Version == "unknown" || Version == "" {
 		defaultConfigBytes, err := resources.DefaultConfig.ReadFile("default_config.yml")
 		if err == nil {
 			re := regexp.MustCompile(`(?m)^version:\s*"([^"]+)"`)
