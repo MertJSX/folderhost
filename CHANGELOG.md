@@ -2,6 +2,76 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Keyboard shortcuts**: Added a lot of keyboard shortcuts in UI to improve user experience.
+  - **Login**: Log in much faster using the Enter key. For example, after typing your username, press Enter to jump to the password input. Previously, you had to click the password field with your mouse — now you don't.
+  - **Creating a file**: The plus button in File Explorer opens a menu to create a file
+    or directory. Previously you had to type the name and click "Create directory" or
+    "Create file". Now you can press Enter instead. The app checks whether the name has
+    a file extension: `item.txt` + Enter creates a file, while `example.com` requires
+    clicking "Create directory" manually. The UI highlights the default action.
+  - **Message boxes**: Now you can automatically close the error/info boxes by pressing Enter instead of manually clicking with your mouse.
+- **File types**: Added icon support for many new file extensions, categorized below.
+  - **Images**: bmp, tiff, tif, heic, heif, avif, raw, cr2, nef, arw, psd, ai, xd, xcf
+  - **Documents**: txt, rtf, epub, mobi, tex, xps, odt, ods, odp
+  - **Archives**: xz, bz2, lz, lzma, zst, deb, rpm, appimage, snap
+  - **Video**: mkv, avi, mov, wmv, flv, webm, m4v, mpg, mpeg, 3gp, ogv
+  - **Audio**: acc, m4a, ogg, wma, aiff, mid, midi, ape
+  - **Web**: scss, sass, less, styl
+  - **Programming languages**:
+    - **Frontend**: tsx, jsx, vue, svelte
+    - **Systems**: c, h, cpp, cc, cxx, hpp, hh, hxx, asm, s, bin, o, obj
+    - **Scientific**: f, f77, f90, f95, f03, f08, for, mat, h5, hdf5, nc, rdata, rds, parquet, arrow
+    - **Legacy**: pas, pp, dpr, dpk
+    - **Functional**: hs, lhs, fs, fsx, fsi, ex, exs
+    - **Modern**: cs, zig, sol, go, mod, sum, gradle, rs, scala, sc, swift, kt, kts, dart
+    - **Scripting**: rb, erb, lua, pl, pm, zsh, fish, ksh, csh, ps1, psm1, psd1, ipynb
+    - **Others**: vb, vbs, bas
+  - **Config**: conf, cfg, properties, env, toml
+  - **Executables & system**: exe, dll, msi, cab, msix, sys
+  - **Databases**: sqlitedb
+  - **Disk images**: iso, img, vhd, vhdx, vmdk, qcow2, vdi
+  - **3D models**: blend, blend1, blend2, fbx, dae, gltf, glb, stl, 3ds, obj3d, step, stp, iges, igs, gcode
+  - **Game engines**:
+    - **Godot**: godot, tscn, gd, tres
+    - **Blockbench**: bbmodel
+  - **Fonts**: ttf, otf, woff, woff2, eot
+  - **Certificates & keys**: pem, crt, cer, key, pub, p12, pfx, gpg, asc
+  - **Mobile packages**: apk, aab, xapk
+  - **Torrent files**: torrent, torrentfile
+  - **Logs & temp files**: log, bak, tmp, temp, swp
+  - **Markdown**: mdx
+
+
+### Changed
+
+- **Duplicate file uploads**: Uploading a file whose name already exists in the target
+  directory now fails with an error instead of silently replacing it. This prevents
+  users with upload-only permissions (but no delete permission) from overwriting files
+  they shouldn't be able to remove. A future update may allow auto-replace for users
+  with both `upload_files` and `delete` permissions.
+- **Upload speed**: Uploads are now much faster — on par with (and sometimes faster
+  than) FTP. A ~4 GB file that previously took 14 seconds now takes about 8 seconds.
+  Tested on localhost; real-world results depend on network speed.
+- **Upload UI**: Improved UI/UX for upload menu. Now you can see more information on uploading a file. (like: elapsed time, remaining time, upload speed, downloaded data etc.)
+- **Dependencies**: `react-icons` updated from 5.5.0 to 5.7.0.
+- **Version fallback**: If the program can't determine its version, it falls back to
+  the version defined in `default_config.yml` embedded in the binary.
+
+### Fixed
+
+- **Laptop screen layout**: On smaller laptops, users previously had to scroll
+  constantly. Many UI elements are now more compact and better sized for smaller
+  screens.
+- **Critical unzip bug**: When extracting a ZIP file that exceeded the remaining
+  logical space, the cleanup logic called `os.RemoveAll(dest)` — where `dest` was the
+  extraction target directory. If the ZIP was located at the root of the scope,
+  `dest` equaled the scoped folder itself, causing the entire host directory to be
+  deleted.
+
 ## [v26.8.0] - 2026-08-15
 
 ### Added
