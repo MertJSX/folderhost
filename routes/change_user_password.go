@@ -34,9 +34,9 @@ func ChangeUserPassword(c *fiber.Ctx) error {
 		})
 	}
 
-	if *requestBody.User.ID == 1 {
+	if *requestBody.User.ID == 1 || requestBody.User.Username == "system" {
 		return c.Status(400).JSON(fiber.Map{
-			"err": "You can't update admin account from the web panel. Use config.yml instead.",
+			"err": "You can't update admin or system account from the web panel. Use config.yml instead.",
 		})
 	}
 

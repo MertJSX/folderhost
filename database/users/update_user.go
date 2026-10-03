@@ -1,11 +1,18 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/MertJSX/folderhost/database"
 	"github.com/MertJSX/folderhost/types"
 )
 
 func UpdateUser(id int, user *types.Account) error {
+
+	if user.Username == "system" {
+		return fmt.Errorf("username 'system' is reserved")
+	}
+
 	const query = `
 		UPDATE users SET
 			username = ?,

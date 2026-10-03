@@ -7,8 +7,10 @@ import (
 
 	"github.com/MertJSX/folderhost/database"
 	"github.com/MertJSX/folderhost/database/users"
+	"github.com/MertJSX/folderhost/types"
 	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/config"
+	"github.com/google/uuid"
 )
 
 func InitializeDatabase() {
@@ -35,21 +37,60 @@ func InitializeDatabase() {
 		log.Fatal(err)
 	}
 
-	// Automatically ensure all tables exist (Safe due to IF NOT EXISTS)
-	// For future releases we can make something better...
 	database.CreateUsersTable()
 	database.CreateLogsTable()
 	database.CreateRecoveryTable()
 	database.CreateSharedTable()
 
 	if firstTime {
-		err = users.CreateUser(&config.Config.AdminAccount)
+		err = users.CreateUser(&config.Config.AdminAccount, true)
 		if err != nil {
-			fmt.Println("Error creating Admin account:", err)
+			log.Fatal("Error creating Admin account: ", err)
 		}
 	}
 
-	users.UpdateAdmin(&config.Config.AdminAccount)
+	err = users.UpdateAdmin(&config.Config.AdminAccount)
+	if err != nil {
+		log.Fatal("Error updating Admin account: ", err)
+	}
 
-	fmt.Println("Database connection established successfully!")
+	// Ensure system account exists (used for system-generated logs like auto-cleanup)
+	ensureSystemAccount()
+
+	// fmt.Println("Database connection established successfully!")
+}
+
+func ensureSystemAccount() {
+	systemUser := types.Account{
+		Username: "system",
+		Password: uuid.New().String(), // a random strong password
+		Email:    "",
+		Scope:    "",
+		Permissions: types.AccountPermissions{
+			ReadDirectories: false,
+			ReadFiles:       false,
+			Create:          false,
+			Change:          false,
+			Delete:          false,
+			Move:            false,
+			DownloadFiles:   false,
+			UploadFiles:     false,
+			Rename:          false,
+			Extract:         false,
+			Archive:         false,
+			Copy:            false,
+			ReadRecovery:    false,
+			UseRecovery:     false,
+			ReadUsers:       false,
+			EditUsers:       false,
+			ReadLogs:        false,
+		},
+	}
+
+	err := users.CreateUser(&systemUser, true)
+	if err != nil {
+		if err.Error() != "username already exists" {
+			fmt.Println("Error creating system account:", err)
+		}
+	}
 }

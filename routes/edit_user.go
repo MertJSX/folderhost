@@ -41,6 +41,12 @@ func EditUser(c *fiber.Ctx) error {
 
 	username, err := users.GetUsername(*requestBody.User.ID)
 
+	if username == "system" {
+		return c.Status(403).JSON(fiber.Map{
+			"err": "You can't edit the system account!",
+		})
+	}
+
 	if requestBody.User.Username == "" || err != nil {
 		return c.Status(400).JSON(
 			fiber.Map{"err": "Username is missing or not existing in db."},
