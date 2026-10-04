@@ -75,6 +75,11 @@ func CheckAuth(c *fiber.Ctx) error {
 		}
 		c.Locals("username", username)
 	} else {
+
+		if reqUsername == "system" {
+			return c.Status(403).JSON(fiber.Map{"err": "username is reserved"})
+		}
+
 		username = reqUsername
 		password = reqPassword
 		controlPassword = true

@@ -9,6 +9,8 @@ import (
 )
 
 func AutoClearOldLogs() {
+	time.Sleep(10 * time.Second)
+
 	ticker := time.NewTicker(24 * time.Hour)
 	defer ticker.Stop()
 

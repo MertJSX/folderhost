@@ -5,7 +5,7 @@ import LoadingComponent from "../../components/LoadingComponent/LoadingComponent
 import type { Account } from "../../types/Account";
 import { FaUserFriends, FaUserPlus, FaUser, FaEnvelope, FaSearch, FaUsers } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { IoTelescopeSharp } from "react-icons/io5";
+import { IoTelescopeSharp, IoSettingsSharp } from "react-icons/io5";
 
 const Users: React.FC = () => {
   const navigate = useNavigate()
@@ -123,7 +123,11 @@ const Users: React.FC = () => {
                       {/* Avatar/Icon */}
                       <div className="flex-shrink-0 mr-4">
                         <div className="p-3 bg-sky-500 rounded-full group-hover:bg-sky-500 transition-colors">
-                          <FaUser className="text-white" />
+                          {user.username === "system" ? (
+                            <IoSettingsSharp className="text-white" />
+                          ) : (
+                            <FaUser className="text-white" />
+                          )}
                         </div>
                       </div>
 

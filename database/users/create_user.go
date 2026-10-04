@@ -10,7 +10,13 @@ import (
 	"github.com/MertJSX/folderhost/utils"
 )
 
-func CreateUser(user *types.Account) error {
+func CreateUser(user *types.Account, allowReserved bool) error {
+	if !allowReserved {
+		if user.Username == "system" {
+			return fmt.Errorf("username is reserved")
+		}
+	}
+
 	if exists, _ := CheckIfUsernameExists(user.Username); exists {
 		return fmt.Errorf("username already exists")
 	}

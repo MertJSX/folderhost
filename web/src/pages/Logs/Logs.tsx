@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 import moment from "moment";
 import axiosInstance from "../../utils/axiosInstance"
 import { FaSync, FaSearch, FaCalendar, FaUser, FaPencilAlt, FaList } from "react-icons/fa";
+import { IoSettingsSharp } from "react-icons/io5";
 import MessageBox from "../../components/minimal/MessageBox/MessageBox";
 import type { AuditLog } from "../../types/AuditLog";
 import { Link } from "react-router-dom";
@@ -195,9 +196,13 @@ const Logs: React.FC = () => {
                             >
                                 <div className="col-span-2">
                                     <div className="flex items-center gap-2">
-                                        <FaUser className="text-sky-400 text-sm" />
-                                        <Link to={`/users/${log.username}`} className="text-white font-medium truncate cursor-pointer hover:text-cyan-200">
-                                            {log.username}
+                                        {log.username === "system" ? (
+                                            <IoSettingsSharp className="text-lg" />
+                                        ) : (
+                                            <FaUser className="text-sm" />
+                                        )}
+                                        <Link to={`/users/${log.username}`} className={`font-medium truncate cursor-pointer hover:text-cyan-200 ${log.username === "system" ? "text-sky-200 italic" : "text-white"}`}>
+                                            {log.username == "system" ? "System" : log.username}
                                         </Link>
                                     </div>
                                 </div>

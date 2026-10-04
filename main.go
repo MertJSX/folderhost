@@ -48,7 +48,6 @@ var (
 )
 
 func main() {
-	fmt.Printf("Version is: %s\n", Version)
 	if Version == "unknown" || Version == "" {
 		defaultConfigBytes, err := resources.DefaultConfig.ReadFile("default_config.yml")
 		if err == nil {
@@ -92,6 +91,7 @@ func main() {
 
 	go cache.ListenDirectorySetCacheEvents()
 	go tasks.AutoClearOldLogs()
+	go tasks.AutoCleanupRecovery()
 
 	config := &config.Config
 	var portInt int = config.Port

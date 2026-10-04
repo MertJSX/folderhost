@@ -2,13 +2,20 @@ package users
 
 import (
 	"encoding/hex"
+	"fmt"
 
 	"github.com/MertJSX/folderhost/database"
 	"github.com/MertJSX/folderhost/types"
 	"github.com/MertJSX/folderhost/utils"
+	"github.com/MertJSX/folderhost/utils/config"
 )
 
 func UpdateAdmin(user *types.Account) error {
+
+	if config.Config.AdminAccount.Username == "system" {
+		return fmt.Errorf("username 'system' is reserved, please change the admin username in the config file")
+	}
+
 	const query = `
 		UPDATE users SET
 			username = ?,

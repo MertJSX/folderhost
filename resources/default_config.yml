@@ -8,7 +8,7 @@
 # Thanks for using my application!!! Please report if you catch any bugs!
 # Here is the GitHub page of FolderHost: https://github.com/MertJSX/folderhost
 # Contact for security vulnerabilities: contact@mertsami.com
-version: "v26.9.0"
+version: "v26.10.0"
 
 # Port is required. Don't delete it!
 port: 5000
@@ -53,6 +53,12 @@ recovery_bin: true
 
 # Optionally you can limit recovery_bin storage. You can remove it if you want.
 bin_storage_limit: "5 GB"
+
+# Automatically remove old recovery records after a specified duration.
+# Supported units: s (seconds), m (minutes), h (hours), d (days), w (weeks).
+# Examples: "30m", "1h", "7d", "2w"
+# Set to "0" to disable automatic cleanup.
+auto_cleanup_recovery: "7d"
 
 # Enable/Disable logging activities
 log_activities: true

@@ -34,6 +34,12 @@ func RemoveUser(c *fiber.Ctx) error {
 
 	username, err := users.GetUsername(idToInt)
 
+	if username == "system" {
+		return c.Status(403).JSON(fiber.Map{
+			"err": "You can't remove the system account!",
+		})
+	}
+
 	if err != nil {
 		cache.SessionCache.Clear()
 	}

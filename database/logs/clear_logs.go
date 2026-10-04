@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/MertJSX/folderhost/database"
+	"github.com/MertJSX/folderhost/types"
 )
 
 func ClearOldLogs(days int) error {
@@ -52,6 +53,12 @@ func ClearOldLogs(days int) error {
 		return nil
 	}
 
-	log.Printf("Successfully cleared %d old log records (older than %d days)", rowsAffected, days)
+	if err := CreateLog(types.AuditLog{
+		Username:    "system",
+		Action:      "Logs cleanup",
+		Description: fmt.Sprintf("Successfully cleared %d old log records (older than %d days)", rowsAffected, days),
+	}); err != nil {
+		fmt.Printf("Failed to create audit log: %s\n", err)
+	}
 	return nil
 }

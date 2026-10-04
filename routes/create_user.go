@@ -38,7 +38,7 @@ func CreateUser(c *fiber.Ctx) error {
 		)
 	}
 
-	err := users.CreateUser(&requestBody.User)
+	err := users.CreateUser(&requestBody.User, true)
 
 	if err != nil {
 		if err.Error() == "username already exists" {
