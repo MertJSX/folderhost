@@ -6,6 +6,7 @@ import (
 
 	"github.com/MertJSX/folderhost/database/recovery"
 	"github.com/MertJSX/folderhost/types"
+	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -59,10 +60,21 @@ func Recovery(c *fiber.Ctx) error {
 		)
 	}
 
+	var timeoutMs int64 = 0
+	if config.Config.AutoCleanupRecovery != "" {
+		duration, err := utils.ParseExtendedDuration(config.Config.AutoCleanupRecovery)
+		if err != nil {
+			fmt.Printf("Recovery config parse error: %v\n", err)
+		} else {
+			timeoutMs = duration.Milliseconds()
+		}
+	}
+
 	return c.Status(200).JSON(
 		fiber.Map{
-			"records": records,
-			"isLast":  len(nextRecords) == 0,
+			"records":    records,
+			"isLast":     len(nextRecords) == 0,
+			"timeout_ms": timeoutMs,
 		},
 	)
 }
