@@ -7,6 +7,7 @@ import { type RecoveryRecord } from "../../types/RecoveryRecord";
 import MessageBox from "../../components/minimal/MessageBox/MessageBox";
 import { FaArrowRotateLeft } from "react-icons/fa6";
 import { DirectoryItemIcon } from "../../utils/DirectoryItemIcon";
+import { getRemainingLifetime, getLifetimeColor } from "../../utils/recoveryLifetime";
 
 const Recovery: React.FC = () => {
     const [recoveryRecords, setRecoveryRecords] = useState<Array<RecoveryRecord>>([]);
@@ -16,6 +17,7 @@ const Recovery: React.FC = () => {
     const [isEmpty, setIsEmpty] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [message, setMessage] = useState<string>("")
+    const [timeoutMs, setTimeoutMs] = useState<number>(0);
     const logoSize = 20;
 
     useEffect(() => {
@@ -38,6 +40,9 @@ const Recovery: React.FC = () => {
                 setIsEmpty(true)
                 setRecoveryRecords([])
                 return
+            }
+            if (typeof data.data.timeout_ms === "number") {
+                setTimeoutMs(data.data.timeout_ms);
             }
             if (data.data.isLast) {
                 setLoadIndex(0);
@@ -139,7 +144,7 @@ const Recovery: React.FC = () => {
             <MessageBox message={message} isErr={isError} setMessage={setMessage} />
             <main className="mt-5">
                 <div className="flex flex-col md:flex-row justify-center items-center px-6">
-                    <section className="flex flex-col bg-gray-800 gap-4 w-4/5 max-w-[1000px] p-4 md:p-6 min-w-[400px] md:min-w-[600px] min-h-[550px] 2xl:min-h-[600px] h-[550px] 2xl:h-[700px] max-h-[800px] shadow-2xl rounded-lg">
+                    <section className="flex flex-col bg-gray-800 gap-4 w-4/5 max-w-[1000px] p-4 md:p-6 min-w-[400px] md:min-w-[600px] min-h-[600px] h-[95vh] 2xl:h-[95vh] max-h-[800px] shadow-2xl rounded-lg">
                         {/* Header Section */}
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                             <div className="flex items-center gap-3">
@@ -184,38 +189,49 @@ const Recovery: React.FC = () => {
                         {/* Records List */}
                         <section className="flex flex-col gap-1 overflow-y-auto flex-1 pr-2">
                             {recoveryRecords[0] ? (
-                                recoveryRecords.map((record) => (
-                                    <article
-                                        onClick={() => setRecordInfo(record)}
-                                        key={record.id}
-                                        className={`flex items-center p-1 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-sky-400 hover:translate-x-1 ${recordInfo?.id === record.id
-                                            ? 'border-sky-500 bg-gray-500'
-                                            : 'border-gray-600'
-                                            }`}
-                                    >
-                                        <div className="flex items-center justify-center min-w-[3rem]">
-                                            <DirectoryItemIcon
-                                                logoSize={logoSize}
-                                                itemInfo={{
-                                                    isDirectory: record.isDirectory,
-                                                    name: record.oldLocation.split('/').pop() || record.oldLocation,
-                                                    path: record.oldLocation
-                                                } as any}
-                                            />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-green-200 font-medium truncate">
-                                                {record.oldLocation}
+                                recoveryRecords.map((record) => {
+                                    const lifetime = getRemainingLifetime(record.created_at, timeoutMs, "short");
+                                    const lifetimeColor = getLifetimeColor(record.created_at, timeoutMs, "text-gray-400");
+                                    return (
+                                        <article
+                                            onClick={() => setRecordInfo(record)}
+                                            key={record.id}
+                                            className={`flex items-center p-1 bg-gray-700 rounded border-2 cursor-pointer transition-all hover:border-sky-400 hover:translate-x-1 ${recordInfo?.id === record.id
+                                                ? 'border-sky-500 bg-gray-500'
+                                                : 'border-gray-600'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-center min-w-[3rem]">
+                                                <DirectoryItemIcon
+                                                    logoSize={logoSize}
+                                                    itemInfo={{
+                                                        isDirectory: record.isDirectory,
+                                                        name: record.oldLocation.split('/').pop() || record.oldLocation,
+                                                        path: record.oldLocation
+                                                    } as any}
+                                                />
                                             </div>
-                                            <div className="text-sm text-gray-400">
-                                                {moment(record.created_at).format("Do MMMM YYYY HH:mm")}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-green-300 font-medium truncate">
+                                                    {record.oldLocation}
+                                                </div>
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="text-gray-400">
+                                                        {moment(record.created_at).format("Do MMMM YYYY HH:mm")}
+                                                    </span>
+                                                    {lifetime && (
+                                                        <span className={`${lifetimeColor} font-medium`}>
+                                                            · {lifetime}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className="text-sm text-right text-gray-300 whitespace-nowrap ml-4">
-                                            {record.sizeDisplay}
-                                        </div>
-                                    </article>
-                                ))
+                                            <div className="text-sm text-right text-gray-300 whitespace-nowrap ml-4">
+                                                {record.sizeDisplay}
+                                            </div>
+                                        </article>
+                                    );
+                                })
                             ) : null}
 
                             {/* Load More Button */}
@@ -245,6 +261,7 @@ const Recovery: React.FC = () => {
                             handleRecoverRecord={handleRecoverRecord}
                             handleDeleteRecord={handleRemoveRecord}
                             recordInfo={recordInfo}
+                            timeoutMs={timeoutMs}
                         />
                     )}
                 </div>
