@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Recovery cleaner**: Automatically removes old items from the recovery bin. You can set the duration after which a recovery item is permanently removed. The current default is 7 days, but you can change it. New info will appear in the Recovery page showing how much time remains until each file's deletion.
 - **Keyboard shortcuts**: Added a lot of keyboard shortcuts in UI to improve user experience.
   - **Login**: Log in much faster using the Enter key. For example, after typing your username, press Enter to jump to the password input. Previously, you had to click the password field with your mouse — now you don't.
   - **Creating a file**: The plus button in File Explorer opens a menu to create a file
@@ -56,21 +57,19 @@ All notable changes to this project will be documented in this file.
 - **Upload speed**: Uploads are now much faster — on par with (and sometimes faster
   than) FTP. A ~4 GB file that previously took 14 seconds now takes about 8 seconds.
   Tested on localhost; real-world results depend on network speed.
-- **Upload UI**: Improved UI/UX for upload menu. Now you can see more information on uploading a file. (like: elapsed time, remaining time, upload speed, downloaded data etc.)
+- **Upload UI**: The upload menu now shows more information: elapsed time, remaining
+time, upload speed, and transferred bytes.
 - **Dependencies**: `react-icons` updated from 5.5.0 to 5.7.0.
 - **Version fallback**: If the program can't determine its version, it falls back to
   the version defined in `default_config.yml` embedded in the binary.
+- **Recovery UI colors**: Updated the recovery bin to a more bluish color scheme.
+- **Logs cleaner**: Cleanup events now appear in the audit logs as system updates
+instead of being printed to the terminal.
 
 ### Fixed
 
-- **Laptop screen layout**: On smaller laptops, users previously had to scroll
-  constantly. Many UI elements are now more compact and better sized for smaller
-  screens.
-- **Critical unzip bug**: When extracting a ZIP file that exceeded the remaining
-  logical space, the cleanup logic called `os.RemoveAll(dest)` — where `dest` was the
-  extraction target directory. If the ZIP was located at the root of the scope,
-  `dest` equaled the scoped folder itself, causing the entire host directory to be
-  deleted.
+- **Laptop screen layout**: On smaller laptops, users previously had to scroll constantly. Many UI elements are now more compact and better sized for smaller screens.
+- **Critical unzip bug**: When extracting a ZIP file that exceeded the remaining logical space, the cleanup logic called `os.RemoveAll(dest)` — where `dest` was the extraction target directory. If the ZIP was located at the root of the scope, `dest` equaled the scoped folder itself, causing the entire host directory to be deleted.
 
 ## [v26.8.0] - 2026-08-15
 
