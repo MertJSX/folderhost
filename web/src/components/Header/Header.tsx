@@ -7,6 +7,7 @@ import { useCallback, useLayoutEffect, useState } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import UserMenu from './UserMenu';
 import fullLogo from '../../assets/folderhost-logo.webp'
+import favicon from '../../assets/favicon.webp'
 
 const Header = () => {
     let location = useLocation();
@@ -106,10 +107,10 @@ const Header = () => {
             </section>
 
             {/* Mobile Header */}
-            <section className='flex md:hidden flex-col items-center w-full px-6 py-3'>
+            <section className='flex md:hidden items-center justify-center w-full px-6 py-3'>
                 {/* Logo */}
-                <div className="flex items-center gap-3 mb-4">
-                    <img src={fullLogo} width={200} alt='' />
+                <div className="flex items-center justify-center gap-3 pr-3 border-r border-white">
+                    <img src={favicon} width={40} alt='' />
                 </div>
 
                 {/* User Info and Logout */}
