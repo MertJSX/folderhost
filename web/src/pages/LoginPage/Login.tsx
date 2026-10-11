@@ -92,10 +92,10 @@ const Login = () => {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <div className="flex items-center justify-center mt-[5vh] md:mt-0 md:min-h-screen 2xl:bg-slate-900">
             <form
                 onSubmit={verifyPassword}
-                className="relative flex flex-col p-10 gap-6 rounded-xl w-full max-w-md bg-slate-800 border border-slate-700 shadow-2xl"
+                className="relative flex flex-col p-6 md:p-10 gap-6 rounded-xl w-full max-w-md md:bg-slate-800 md:border border-slate-700 shadow-2xl"
             >
                 {/* Logo/Icon */}
                 <div className="flex flex-col items-center gap-3 mb-2">
