@@ -306,12 +306,12 @@ const FileExplorer: React.FC = () => {
         </div>
 
         {/* Navigation Buttons */}
-        <div className='flex gap-2'>
+        <div className='flex gap-2 justify-end w-full md:w-auto'>
           {isLoading ? <LoadingComponent /> : null}
 
           {(directory && path != "./") && (
             <button
-              className='flex items-center gap-2 bg-gray-700 hover:bg-gray-600 hover:border-gray-600 text-white p-2 md:p-3 rounded-lg transition-colors border-2 border-gray-700'
+              className='flex items-center gap-2 bg-gray-700 hover:bg-gray-600 hover:border-gray-600 text-white px-2 md:p-3 rounded-lg transition-colors border-2 border-gray-700'
               ref={previousDirRef}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
@@ -481,7 +481,7 @@ const FileExplorer: React.FC = () => {
             return (
               <div
                 ref={addToChildElements}
-                className={`grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-center p-2 md:p-0.5 bg-gray-700 rounded-lg border-2 transition-all cursor-pointer group
+                className={`grid grid-cols-1 md:grid-cols-12 gap-2 md:gap-4 items-center p-0.5 bg-gray-700 rounded-lg border-2 transition-all cursor-pointer group
                   ${selectedChildEl === element.id
                     ? 'border-gray-200'
                     : isSelected && selectedItems.length > 1
@@ -539,7 +539,7 @@ const FileExplorer: React.FC = () => {
                     </div>
                     <div className="flex gap-2 text-xs text-gray-400 mt-1">
                       <span>{moment(element.dateModified).format("MMM DD")}</span>
-                      <span>{getDisplaySize(element)}</span>
+                      <span className='text-cyan-200'>{getDisplaySize(element)}</span>
                     </div>
                   </div>
                 </div>
