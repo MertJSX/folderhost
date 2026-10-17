@@ -342,12 +342,12 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
   return (
     <div className={"flex flex-col h-screen bg-gray-900"}>
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-gray-800 border-b border-gray-700">
+      <div className="flex items-center justify-between px-1 md:px-6 py-2 md:py-4 bg-gray-800 border-b border-gray-700">
         <div className="flex items-center space-x-6">
           {/* Logo/Brand */}
           <div className="flex items-center space-x-2">
             <FiCode className="w-6 h-6" />
-            <span className="text-xl font-bold text-white"><span className='italic'>FolderHost</span> Editor</span>
+            <span className="text-md md:text-xl font-bold text-white flex gap-2"><span className='hidden md:block italic'>FolderHost</span> Editor</span>
           </div>
 
           {/* File Info */}
@@ -359,8 +359,8 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
           {/* Online Users */}
           <div className="flex items-center space-x-2 text-green-400">
             <FiUsers className="w-4 h-4" />
-            <span className="text-sm">
-              Online: <span className="font-semibold text-emerald-300">{clientsCount}</span>
+            <span className="text-sm flex gap-1">
+              <span className="hidden md:block">Online:</span> <span className="font-semibold text-emerald-300">{clientsCount}</span>
             </span>
           </div>
 
@@ -373,23 +373,23 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-1 md:space-x-3">
           <button
             onClick={() => editorRef.current?.trigger("myapp", "undo", "")}
-            className="p-2 text-2xl bg-slate-600 rounded-full hover:bg-sky-600 transition-colors"
+            className="p-2 md:text-2xl bg-slate-600 rounded-full hover:bg-sky-600 transition-colors"
           >
             <FaArrowLeft />
           </button>
           <button
             onClick={() => editorRef.current?.trigger("myapp", "redo", "")}
-            className="p-2 text-2xl bg-slate-600 rounded-full hover:bg-sky-600 transition-colors"
+            className="p-2 md:text-2xl bg-slate-600 rounded-full hover:bg-sky-600 transition-colors"
           >
             <FaArrowRight />
           </button>
           {/* Settings Toggle */}
           <button
             onClick={() => setToggleSettings(!toggleSettings)}
-            className={`flex items-center space-x-2 px-4 py-2 transition-colors rounded-lg ${toggleSettings
+            className={`hidden md:flex items-center space-x-2 px-4 py-2 transition-colors rounded-lg ${toggleSettings
               ? 'bg-blue-500 text-white'
               : 'text-gray-400 hover:text-white hover:bg-gray-700'
               }`}
