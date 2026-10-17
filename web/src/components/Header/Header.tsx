@@ -8,6 +8,7 @@ import axiosInstance from '../../utils/axiosInstance';
 import UserMenu from './UserMenu';
 import fullLogo from '../../assets/folderhost-logo.webp'
 import favicon from '../../assets/favicon.webp'
+import { FiLogOut } from 'react-icons/fi';
 
 const Header = () => {
     let location = useLocation();
@@ -54,7 +55,7 @@ const Header = () => {
             'px-2.5 py-2 lg:px-3.5 lg:py-2.5 xl:px-5 xl:py-3 ' +
             'text-sm lg:text-[15px] xl:text-sm 2xl:text-base ' +
             'transition-all border-b-2 whitespace-nowrap';
-        const activeClasses = 'text-sky-400 border-sky-500';
+        const activeClasses = 'text-sky-400 md:border-sky-500';
         const inactiveClasses =
             'text-white border-transparent hover:bg-slate-700 hover:text-sky-400 hover:border-sky-500';
 
@@ -217,8 +218,24 @@ const Header = () => {
                         to={"/logs"}
                         onClick={closeMobileMenu}
                         tabIndex={isMobileMenuOpen ? 0 : -1}>
-                        <FaPencilAlt className="w-4 h-4" />
+                        <FaPencilAlt className="w-4 h-5" />
                         Logs
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/logout')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '250ms' : '0ms' }}
+                        to={"/logout"}
+                        onClick={() => {
+                            axiosInstance.put("/logout").then(() => {
+                                Cookies.remove("token");
+                                window.location.href = "/login";
+                            });
+                        }}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <FiLogOut className="w-5 h-5" />
+                        Logout
                     </Link>
                 </nav>
             </div>
