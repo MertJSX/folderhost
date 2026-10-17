@@ -60,7 +60,7 @@ const Users: React.FC = () => {
     <div>
       {/* <Header /> */}
       <MessageBox message={message} isErr={isError} setMessage={setMessage} />
-      <main className="mt-10">
+      <main className="md:mt-10">
         <div className="flex flex-col items-center">
           {/* Main Container */}
           <section className="flex flex-col bg-gray-800 rounded-xl shadow-2xl w-full max-w-6xl min-h-[700px] h-auto p-6">
@@ -78,7 +78,7 @@ const Users: React.FC = () => {
 
               <Link
                 to="/users/new"
-                className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-200 hover:scale-105 min-w-[140px] justify-center"
+                className="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold py-1 px-2 md:py-2 md:px-4 rounded-lg transition-all duration-200 hover:scale-105 min-w-[140px] justify-center"
               >
                 <FaUserPlus size={18} />
                 Add User
@@ -118,7 +118,7 @@ const Users: React.FC = () => {
                     <article
                       onClick={() => navigate(`/users/${user.username}`)}
                       key={user.username}
-                      className="flex items-center p-4 bg-gray-700 border border-gray-700 hover:border-sky-300 cursor-pointer transition-all duration-200 hover:bg-gray-600 group mb-2 rounded-lg"
+                      className="flex items-center p-1 md:p-4 bg-gray-700 border border-gray-700 hover:border-sky-300 cursor-pointer transition-all duration-200 hover:bg-gray-600 group mb-2 rounded-lg"
                     >
                       {/* Avatar/Icon */}
                       <div className="flex-shrink-0 mr-4">
@@ -155,7 +155,7 @@ const Users: React.FC = () => {
                           </div>
 
                           {/* Arrow Indicator */}
-                          <div className="text-gray-400 group-hover:text-sky-400 transition-colors">
+                          <div className="hidden md:block text-gray-400 group-hover:text-sky-400 transition-colors">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                             </svg>

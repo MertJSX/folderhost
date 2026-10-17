@@ -100,7 +100,7 @@ const Logs: React.FC = () => {
         <div>
             {/* <Header /> */}
             <MessageBox message={message} isErr={isError} setMessage={setMessage} />
-            <main className="mt-10 flex flex-col mx-auto bg-gray-800 gap-4 w-full max-w-6xl p-6 min-h-[600px] h-[700px] max-h-[800px] shadow-2xl rounded-lg">
+            <main className="md:mt-10 flex flex-col mx-auto bg-gray-800 gap-4 w-full max-w-6xl p-3 md:p-6 min-h-[600px] h-[700px] max-h-[800px] shadow-2xl rounded-lg">
                 {/* Header Section */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
                     <div className="flex items-center gap-3">
@@ -137,9 +137,10 @@ const Logs: React.FC = () => {
                         <div className="relative flex-1">
                             <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                             <select
+                                id="user-filter"
                                 value={usernameFilter}
                                 onChange={(e) => setUsernameFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
+                                className="w-full md:h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             >
                                 <option value="">All Users</option>
                                 {uniqueUsernames.map(username => (
@@ -156,7 +157,7 @@ const Logs: React.FC = () => {
                                 type="date"
                                 value={dateFilter}
                                 onChange={(e) => setDateFilter(e.target.value)}
-                                className="w-full h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
+                                className="w-full md:h-11 pl-10 pr-4 py-1 bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:border-sky-500"
                             />
                         </div>
 
@@ -185,16 +186,34 @@ const Logs: React.FC = () => {
                         <div className="col-span-2 text-gray-300 font-semibold">User</div>
                         <div className="col-span-2 text-gray-300 font-semibold">Action</div>
                         <div className="col-span-6 text-gray-300 font-semibold">Description</div>
-                        <div className="col-span-2 text-gray-300 font-semibold text-right">Date & Time</div>
+                        <div className="col-span-2 text-gray-300 font-semibold text-right flex gap-1 justify-end">Date <span className="hidden md:block font-normal">& Time</span></div>
                     </div>
 
                     {filteredLogs.length > 0 ? (
                         filteredLogs.map((log, index) => (
                             <article
                                 key={log.id || index}
-                                className="grid grid-cols-12 gap-4 items-center p-1 bg-gray-700 rounded-lg border border-gray-600 hover:border-sky-400 transition-all px-3"
+                                className="grid grid-cols-12 gap-4 items-center p-0.5 md:p-1 bg-gray-700 rounded-lg border border-gray-600 hover:border-sky-400 transition-all px-3"
                             >
-                                <div className="col-span-2">
+                                <div className="md:hidden col-span-4">
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-2">
+                                            {log.username === "system" ? (
+                                                <IoSettingsSharp className="text-lg" />
+                                            ) : (
+                                                <FaUser className="text-sm" />
+                                            )}
+                                            <Link to={`/users/${log.username}`} className={`font-medium truncate text-sm cursor-pointer hover:text-cyan-200 ${log.username === "system" ? "text-sky-200 italic" : "text-white"}`}>
+                                                {log.username == "system" ? "System" : log.username}
+                                            </Link>
+                                        </div>
+                                        <span className={`px-2 py-1 rounded text-center text-xs font-semibold bg-gray-500 text-white`}>
+                                        {log.action}
+                                    </span>
+                                    </div>
+                                </div>
+
+                                <div className="hidden md:block col-span-2 ml-4">
                                     <div className="flex items-center gap-2">
                                         {log.username === "system" ? (
                                             <IoSettingsSharp className="text-lg" />
@@ -207,21 +226,14 @@ const Logs: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="col-span-2">
-                                    <span className={`px-2 py-1 rounded text-xs font-semibold ${log.action.includes('DELETE') || log.action.includes('REMOVE')
-                                        ? 'bg-red-600 text-white'
-                                        : log.action.includes('CREATE') || log.action.includes('ADD')
-                                            ? 'bg-green-600 text-white'
-                                            : log.action.includes('UPDATE') || log.action.includes('MODIFY')
-                                                ? 'bg-yellow-600 text-white'
-                                                : 'bg-gray-500 text-white'
-                                        }`}>
+                                <div className="hidden md:block col-span-2">
+                                    <span className={`px-2 py-1 rounded text-xs font-semibold bg-gray-500 text-white`}>
                                         {log.action}
                                     </span>
                                 </div>
 
                                 <div className="col-span-6">
-                                    <div className="text-gray-300 whitespace-pre-wrap text-sm break-words">
+                                    <div className="text-gray-300 whitespace-pre-wrap text-xs md:text-sm break-words">
                                         {log.description}
                                     </div>
                                 </div>

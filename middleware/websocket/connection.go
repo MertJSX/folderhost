@@ -43,7 +43,7 @@ func HandleWebsocket(c *websocket.Conn) {
 
 		path = config.GetScopedFolder(account.Scope) + path
 
-		if !utils.IsSafePath(path) {
+		if !utils.IsSafePathForScope(path, account.Scope) {
 			c.Close()
 			return
 		}

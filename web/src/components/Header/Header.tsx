@@ -3,15 +3,19 @@ import { Link, useLocation } from 'react-router-dom';
 import { MdExplore, MdMiscellaneousServices } from "react-icons/md";
 import { FaUserFriends, FaPencilAlt, FaBars, FaTimes } from "react-icons/fa"
 import { FaArrowRotateLeft } from "react-icons/fa6"
-import { useCallback, useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import axiosInstance from '../../utils/axiosInstance';
 import UserMenu from './UserMenu';
 import fullLogo from '../../assets/folderhost-logo.webp'
+import favicon from '../../assets/favicon.webp'
+import { FiLogOut } from 'react-icons/fi';
 
 const Header = () => {
     let location = useLocation();
     const [username, setUsername] = useState<string>(Cookies.get("username") as string);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    const [menuHeight, setMenuHeight] = useState<number>(0);
 
     useLayoutEffect(() => {
         const cookieUsername = Cookies.get("username");
@@ -22,6 +26,12 @@ const Header = () => {
 
         fetchUserInfo()
     }, []);
+
+    useLayoutEffect(() => {
+        if (mobileMenuRef.current) {
+            setMenuHeight(mobileMenuRef.current.scrollHeight);
+        }
+    }, [isMobileMenuOpen]);
 
     const fetchUserInfo = useCallback(() => {
         axiosInstance.get('/user-info'
@@ -45,7 +55,7 @@ const Header = () => {
             'px-2.5 py-2 lg:px-3.5 lg:py-2.5 xl:px-5 xl:py-3 ' +
             'text-sm lg:text-[15px] xl:text-sm 2xl:text-base ' +
             'transition-all border-b-2 whitespace-nowrap';
-        const activeClasses = 'text-sky-400 border-sky-500';
+        const activeClasses = 'text-sky-400 md:border-sky-500';
         const inactiveClasses =
             'text-white border-transparent hover:bg-slate-700 hover:text-sky-400 hover:border-sky-500';
 
@@ -106,10 +116,10 @@ const Header = () => {
             </section>
 
             {/* Mobile Header */}
-            <section className='flex md:hidden flex-col items-center w-full px-6 py-3'>
+            <section className='flex md:hidden items-center justify-center w-full px-6 py-3'>
                 {/* Logo */}
-                <div className="flex items-center gap-3 mb-4">
-                    <img src={fullLogo} width={200} alt='' />
+                <div className="flex items-center justify-center gap-3 pr-3 border-r border-white">
+                    <img src={favicon} width={40} alt='' />
                 </div>
 
                 {/* User Info and Logout */}
@@ -122,55 +132,113 @@ const Header = () => {
                         <button
                             className="p-2 text-white hover:bg-slate-700 rounded-lg transition-all border border-slate-600"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            aria-expanded={isMobileMenuOpen}
+                            aria-controls="mobile-menu"
                         >
-                            {isMobileMenuOpen ? <FaTimes className="w-5 h-5" /> : <FaBars className="w-5 h-5" />}
+                            <div className="relative w-5 h-5">
+                                <FaBars
+                                    className={`absolute inset-0 w-5 h-5 transition-all duration-300 ${
+                                        isMobileMenuOpen ? 'opacity-0 rotate-90 scale-75' : 'opacity-100 rotate-0 scale-100'
+                                    }`}
+                                />
+                                <FaTimes
+                                    className={`absolute inset-0 w-5 h-5 transition-all duration-300 ${
+                                        isMobileMenuOpen ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-75'
+                                    }`}
+                                />
+                            </div>
                         </button>
                     </div>
                 </div>
             </section>
 
             {/* Mobile Navigation Menu */}
-            {isMobileMenuOpen && (
-                <div className="md:hidden w-full bg-slate-800 border-t border-slate-700/50 animate-fadeIn">
-                    <nav className='flex flex-col w-full'>
-                        <Link
-                            className={getNavLinkClass('/explorer')}
-                            to={"/explorer/.%2F"}
-                            onClick={closeMobileMenu}>
-                            <MdExplore className="w-5 h-5" />
-                            Explorer
-                        </Link>
-                        <Link
-                            className={getNavLinkClass('/services')}
-                            to={"/services"}
-                            onClick={closeMobileMenu}>
-                            <MdMiscellaneousServices className="w-5 h-5" />
-                            Services
-                        </Link>
-                        <Link
-                            className={getNavLinkClass('/recovery')}
-                            to={"/recovery"}
-                            onClick={closeMobileMenu}>
-                            <FaArrowRotateLeft className="w-4 h-4" />
-                            Recovery
-                        </Link>
-                        <Link
-                            className={getNavLinkClass('/users')}
-                            to={"/users"}
-                            onClick={closeMobileMenu}>
-                            <FaUserFriends className="w-5 h-5" />
-                            Users
-                        </Link>
-                        <Link
-                            className={getNavLinkClass('/logs')}
-                            to={"/logs"}
-                            onClick={closeMobileMenu}>
-                            <FaPencilAlt className="w-4 h-4" />
-                            Logs
-                        </Link>
-                    </nav>
-                </div>
-            )}
+            <div
+                id="mobile-menu"
+                ref={mobileMenuRef}
+                className="md:hidden w-full bg-slate-800 border-t border-slate-700/50 overflow-hidden transition-all duration-300 ease-in-out"
+                style={{
+                    maxHeight: isMobileMenuOpen ? `${menuHeight}px` : '0px',
+                    opacity: isMobileMenuOpen ? 1 : 0,
+                    transform: isMobileMenuOpen ? 'translateY(0)' : 'translateY(-8px)',
+                    borderTopWidth: isMobileMenuOpen ? '1px' : '0px',
+                }}
+                aria-hidden={!isMobileMenuOpen}
+            >
+                <nav className='flex flex-col w-full'>
+                    <Link
+                        className={`${getNavLinkClass('/explorer')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '50ms' : '0ms' }}
+                        to={"/explorer/.%2F"}
+                        onClick={closeMobileMenu}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <MdExplore className="w-5 h-5" />
+                        Explorer
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/services')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '100ms' : '0ms' }}
+                        to={"/services"}
+                        onClick={closeMobileMenu}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <MdMiscellaneousServices className="w-5 h-5" />
+                        Services
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/recovery')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '150ms' : '0ms' }}
+                        to={"/recovery"}
+                        onClick={closeMobileMenu}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <FaArrowRotateLeft className="w-4 h-4" />
+                        Recovery
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/users')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '200ms' : '0ms' }}
+                        to={"/users"}
+                        onClick={closeMobileMenu}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <FaUserFriends className="w-5 h-5" />
+                        Users
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/logs')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '250ms' : '0ms' }}
+                        to={"/logs"}
+                        onClick={closeMobileMenu}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <FaPencilAlt className="w-4 h-5" />
+                        Logs
+                    </Link>
+                    <Link
+                        className={`${getNavLinkClass('/logout')} transform transition-all duration-300 ${
+                            isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: isMobileMenuOpen ? '250ms' : '0ms' }}
+                        to={"/logout"}
+                        onClick={() => {
+                            axiosInstance.put("/logout").then(() => {
+                                Cookies.remove("token");
+                                window.location.href = "/login";
+                            });
+                        }}
+                        tabIndex={isMobileMenuOpen ? 0 : -1}>
+                        <FiLogOut className="w-5 h-5" />
+                        Logout
+                    </Link>
+                </nav>
+            </div>
         </div>
     )
 }

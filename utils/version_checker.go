@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MertJSX/folderhost/database/logs"
+	"github.com/MertJSX/folderhost/types"
 	"github.com/fatih/color"
 )
 
@@ -126,6 +128,12 @@ func checkAndNotifyVersion(currentVersion string) {
 		normalText.Print("   Download: ")
 		cyanText := color.New(color.FgCyan)
 		cyanText.Print("https://github.com/MertJSX/folderhost/releases\n\n")
+
+		logs.CreateLog(types.AuditLog{
+			Username:    "system",
+			Action:      "Update",
+			Description: fmt.Sprintf("New version available: %s (Current: %s) \nDownload: https://github.com/MertJSX/folderhost/releases", newVersion, currentVersion),
+		})
 	}
 }
 

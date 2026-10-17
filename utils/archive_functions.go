@@ -16,10 +16,10 @@ func removeUnsuccessfulExtraction(extractedPaths []string) {
 	}
 }
 
-func Unzip(src, dest string, cb func(int64, bool, string)) error {
+func Unzip(src, dest string, cb func(int64, bool, string), userScope string) error {
 	r, err := zip.OpenReader(src)
 	if err != nil {
-		return fmt.Errorf("cannot open zip file: %v", err)
+		return fmt.Errorf("Cannot open zip file: %v", err)
 	}
 	defer r.Close()
 
@@ -33,7 +33,7 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 	remainingFolderSpace, err := GetRemainingFolderSpace()
 
 	if err != nil {
-		return fmt.Errorf("cannot get remaining folder space: %v", err)
+		return fmt.Errorf("Cannot get remaining folder space: %v", err)
 	}
 
 	for _, file := range r.File {
@@ -41,8 +41,8 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 
 		filePath := filepath.Join(dest, file.Name)
 
-		if !IsSafePath(filePath) {
-			return fmt.Errorf("security risk: wrong filepath")
+		if !IsSafePathForScope(filePath, userScope) {
+			return fmt.Errorf("Malicious filepath. Item %s is out of your scope.", file.Name)
 		}
 
 		itemInfo, statErr := os.Stat(filePath)
@@ -50,7 +50,7 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 
 		if wasExisting && !itemInfo.IsDir() && !file.FileInfo().IsDir() {
 			removeUnsuccessfulExtraction(extractedPaths)
-			return fmt.Errorf("unable to extract file (%s): file already exists in current directory that you're extracting to", file.Name)
+			return fmt.Errorf("Unable to extract file (%s): file already exists in current directory that you're extracting to", file.Name)
 		}
 
 		// Only track newly created paths (not pre-existing ones)
@@ -59,7 +59,7 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 			extractedPaths = append(extractedPaths, filePath)
 		}
 
-		err := extractFile(file, dest, &totalSize, currentUID, currentGID)
+		err := extractFile(file, dest, &totalSize, currentUID, currentGID, userScope)
 		if err != nil {
 			removeUnsuccessfulExtraction(extractedPaths)
 			log.Printf("Unzip error: %v\n", err)
@@ -77,11 +77,11 @@ func Unzip(src, dest string, cb func(int64, bool, string)) error {
 	return nil
 }
 
-func extractFile(file *zip.File, dest string, totalSize *int64, uid int, gid int) error {
+func extractFile(file *zip.File, dest string, totalSize *int64, uid int, gid int, userScope string) error {
 	filePath := filepath.Join(dest, file.Name)
 
-	if !IsSafePath(filePath) {
-		return fmt.Errorf("security risk: wrong filepath")
+	if !IsSafePathForScope(filePath, userScope) {
+		return fmt.Errorf("Malicious filepath. Item %s is out of your scope.", file.Name)
 	}
 
 	if file.FileInfo().IsDir() {

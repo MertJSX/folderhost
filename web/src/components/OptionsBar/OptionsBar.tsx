@@ -21,7 +21,7 @@ const OptionsBar = () => {
                 <input
                     type="text"
                     spellCheck={false}
-                    className='w-full sm:w-1/2 bg-slate-700 text-sm min-w-[300px] font-bold font-sans rounded-t-lg rounded-l-lg rounded-b-lg md:rounded-r-none md:rounded-tr-none px-2 md:py-0'
+                    className='w-full sm:w-1/2 bg-slate-700 text-sm min-w-[300px] font-bold font-sans rounded-t-lg rounded-l-lg rounded-b-lg md:rounded-r-none md:rounded-tr-none px-2 py-1 md:py-0'
                     placeholder='Path'
                     value={path}
                     onKeyDown={(e) => {
@@ -41,13 +41,13 @@ const OptionsBar = () => {
                     }}
                 />
                 <button
-                    className="bg-sky-600 px-5 active:bg-sky-600 hover:bg-sky-700 w-full py-1 rounded-md md:rounded-none md:py-0 md:w-auto"
+                    className="bg-sky-600 px-5 active:bg-sky-600 hover:bg-sky-700 w-full rounded-md md:rounded-none md:w-auto"
                     onClick={() => {
                         readDir()
                     }}
                 >Refresh</button>
                 <button
-                    className='sm:ml-5 inline-flex justify-between items-center w-full sm:w-48 px-3 py-1.5 2xl:py-2 text-left text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none'
+                    className='sm:ml-5 inline-flex justify-between items-center w-full sm:w-48 px-3 py-1 2xl:py-2 text-left text-sm font-medium text-white bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none'
                     onClick={() => { setSettings(!settings) }}>
                     <IoMdSettings size={buttonSize} />
                     Settings
