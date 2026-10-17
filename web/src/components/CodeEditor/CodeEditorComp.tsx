@@ -151,6 +151,32 @@ const CodeEditorComp: React.FC<CodeEditorCompProps> = ({
       }
     });
 
+    editor.addCommand(monacoInstance.KeyCode.Enter, () => {
+      if (readOnlyRef.current) return;
+
+      const position = editor.getPosition();
+      const model = editor.getModel();
+      if (!position || !model) return;
+
+      const selection = editor.getSelection();
+      const range = selection ?? new monacoInstance.Range(
+        position.lineNumber,
+        position.column,
+        position.lineNumber,
+        position.column
+      );
+
+      editor.executeEdits('manual-enter', [{
+        range,
+        text: '\n',
+        forceMoveMarkers: true,
+      }]);
+
+      const newLine = position.lineNumber + 1;
+      editor.setPosition({ lineNumber: newLine, column: 1 });
+      editor.revealLineInCenterIfOutsideViewport(newLine);
+    });
+
     editor.onDidChangeModelContent((event: editor.IModelContentChangedEvent) => {
       if (readOnlyRef.current) {
         editor.trigger("myapp", "undo", "");
