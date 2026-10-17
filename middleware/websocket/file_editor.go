@@ -53,7 +53,7 @@ func processWebSocketMessage(msg []byte, filePath string, c *websocket.Conn, mt 
 
 		path := config.Config.GetScopedFolder(account.Scope) + "/" + message.Path
 
-		if !utils.IsSafePath(path) {
+		if !utils.IsSafePathForScope(path, account.Scope) {
 			c.Close()
 			return fmt.Errorf("path traversal security issue")
 		}
