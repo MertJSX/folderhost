@@ -142,7 +142,7 @@ const Recovery: React.FC = () => {
         <div>
             {/* <Header /> */}
             <MessageBox message={message} isErr={isError} setMessage={setMessage} />
-            <main className="mt-5">
+            <main className="md:mt-5">
                 <div className="flex flex-col md:flex-row justify-center items-center px-6">
                     <section className="flex flex-col bg-gray-800 gap-4 w-4/5 max-w-[1000px] p-4 md:p-6 min-w-[400px] md:min-w-[600px] min-h-[600px] h-[95vh] 2xl:h-[95vh] max-h-[800px] shadow-2xl rounded-lg">
                         {/* Header Section */}

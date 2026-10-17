@@ -38,7 +38,7 @@ const RecoveryRecordInfo: React.FC<RecoveryRecordInfoProps> = ({
     const lifetimeColor = getLifetimeColor(recordInfo.created_at, timeoutMs, "text-sky-200");
 
     return recordInfo && (
-        <article className="flex flex-col w-1/3 my-4 md:my-0 min-w-[380px] max-w-[450px] min-h-[600px] 2xl:min-h-[600px] h-[95vh] max-h-[800px]">
+        <article className="flex flex-col w-1/3 my-4 md:my-0 min-w-[380px] max-w-[450px] min-h-[600px] 2xl:min-h-[600px] md:h-[95vh] max-h-[800px]">
             <div className="flex flex-col bg-gray-800 gap-4 rounded-xl shadow-2xl w-full h-full p-2">
                 {/* Header Section */}
                 <div className="flex flex-col items-center text-center mb-4">
