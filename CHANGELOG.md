@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- **Windows**: Added a favicon and a description to the Windows build of FolderHost.
+- **Version updates**: Before this, the only way to check for updates was by looking at the terminal where FolderHost runs. Now, update notifications appear directly in your Audit Logs.
+
+### Changed
+
+- **Mobile View**: Most mobile designs have been updated. Added a new animation and another logout button in the mobile Navigation menu. Changed the general mobile designs of these pages to give a better experience to the user:
+  - File Explorer page
+  - Recovery page
+  - Code Editor page
+  - Login page
+  - Audit Logs page
+  - Users page
+- **Dependencies**: Updated browserslist-db to the latest version.
+
+### Fixed
+
+- **Code Editor**: The Enter button was not working; it has now been fixed.
+
+### Security
+
+- **General WebSocket scope issues**: All known issues about user scope are fixed. Big thanks to @hackchang for reporting these issues!
+
 ## [v26.10.0] - 2026-10-05
 
 ### Added
