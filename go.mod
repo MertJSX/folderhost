@@ -15,8 +15,10 @@ require (
 )
 
 require (
+	github.com/akavel/rsrc v0.10.2 // indirect
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/josephspurrier/goversioninfo v1.7.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/text v0.38.0 // indirect
@@ -49,3 +51,5 @@ require (
 	github.com/valyala/fasthttp v1.70.0 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 )
+
+tool github.com/josephspurrier/goversioninfo/cmd/goversioninfo
