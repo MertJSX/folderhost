@@ -13,6 +13,7 @@ test-server:
 
 build: # Example: make build VERSION=v26.5.0
 	cd web && npm run build
+	@./scripts/generate-windows-resource.sh $(VERSION)
 # Linux x86_64
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost main.go
 # Linux ARM32
@@ -20,7 +21,7 @@ build: # Example: make build VERSION=v26.5.0
 # Linux ARM64
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost-linux-arm64 main.go
 # Windows
-	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost.exe main.go
+	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost.exe
 # macOS Intel
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost-mac-amd64 main.go
 # macOS ARM
@@ -28,6 +29,7 @@ build: # Example: make build VERSION=v26.5.0
 # FreeBSD
 	CGO_ENABLED=0 GOOS=freebsd GOARCH=amd64 go build -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath -o ./debug/folderhost-freebsd main.go
 	@echo "All builds completed!"
+	@rm -f resource_windows_amd64.syso
 
 setup:
 	@echo "Downloading Go dependencies..."
