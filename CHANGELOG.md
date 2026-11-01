@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added comprehensive unit tests for file operations:
+  - File creation, reading, moving, renaming, copying, deletion
+  - Error handling for nonexistent files and directories
+  - Validation for file operation endpoints
+
+### Fixed
+- Fixed inconsistent error responses in some file operations.
+- Improved error handling for directory read operations.
+
+## [v26.10.1] - 2026-10-18
+
+### Added
 
 - **Windows**: Added a favicon and a description to the Windows build of FolderHost.
 - **Version updates**: Before this, the only way to check for updates was by looking at the terminal where FolderHost runs. Now, update notifications appear directly in your Audit Logs.
@@ -28,7 +40,7 @@ All notable changes to this project will be documented in this file.
 
 - **General WebSocket scope issues**: All known issues about user scope are fixed. Big thanks to @hackchang for reporting these issues!
 
-## [v26.10.0] - 2026-10-05
+## [v26.10.0] - 2026-10-052026-10-05
 
 ### Added
 
