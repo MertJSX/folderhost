@@ -1,0 +1,39 @@
+# Build stage
+FROM golang:1.25-alpine AS builder
+
+RUN apk add --no-cache gcc musl-dev
+
+WORKDIR /folderhost-server
+
+COPY go.mod go.sum ./
+RUN go mod tidy
+
+COPY main.go ./
+COPY go.mod ./
+COPY go.sum ./
+COPY database/ ./database/
+COPY middleware/ ./middleware/
+COPY routes/ ./routes/
+COPY types/ ./types/
+COPY utils/ ./utils/
+COPY resources/ ./resources/
+RUN mkdir -p web/dist && echo "placeholder" > web/dist/index.html
+RUN mkdir -p host/testdir
+RUN mkdir -p host && \
+    echo "Example data to read" > host/file_to_read.txt && \
+    echo "Example data to delete" > host/file_to_delete.txt && \
+    echo "Example data to rename" > host/file_to_rename.txt && \
+    echo "Example data to move" > host/file_to_move.txt && \
+    echo "Example data to copy" > host/file_to_copy.txt
+ARG VERSION=unknown
+RUN CGO_ENABLED=0 go build -ldflags="-s -w -X main.Version=${VERSION}" -o app main.go
+
+# Runtime stage
+FROM alpine:latest
+
+WORKDIR /folderhost-server/
+COPY --from=builder /folderhost-server/app .
+COPY --from=builder /folderhost-server/host ./host
+
+EXPOSE 5000
+CMD ["./app"]

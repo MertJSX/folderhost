@@ -47,16 +47,19 @@ func ReadDirectory(c *fiber.Ctx) error {
 		)
 	}
 
-	if errors.Is(err, syscall.ENOTDIR) {
-		return c.Status(400).JSON(
-			fiber.Map{"err": "Dirpath is not a directory!"},
-		)
-	}
-
 	if err != nil {
+		if errors.Is(err, syscall.ENOTDIR) {
+			return c.Status(400).JSON(
+				fiber.Map{"err": "Dirpath is not a directory!"},
+			)
+		}
 		return c.Status(400).JSON(
 			fiber.Map{"err": "Unknown error!"},
 		)
+	}
+
+	if !directoryData.IsDir() {
+		return c.Status(400).JSON(fiber.Map{"err": "Dirpath is not a directory!"})
 	}
 
 	dirCache, ok := cache.DirectoryCache.Get(cache.DirectoryCacheKey{

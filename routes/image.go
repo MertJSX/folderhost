@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/MertJSX/folderhost/types"
+	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -29,17 +30,22 @@ func Image(c *fiber.Ctx) error {
 	fileinfo, err := os.Stat(path)
 
 	if os.IsNotExist(err) {
-		return c.JSON(
+		return c.Status(404).JSON(
 			fiber.Map{"err": "Path does not exist!"},
 		)
 	} else if err != nil {
-		return c.JSON(
+		return c.Status(500).JSON(
 			fiber.Map{"err": "Unknown error!"},
 		)
 	}
 	if fileinfo.IsDir() {
-		return c.JSON(
+		return c.Status(400).JSON(
 			fiber.Map{"err": "Item is folder!"},
+		)
+	}
+	if ok := utils.IsSafePathForScope(path, scope); !ok {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "forbidden"},
 		)
 	}
 
@@ -58,16 +64,16 @@ func Image(c *fiber.Ctx) error {
 	}
 
 	if !allowedExtensions[ext] {
-		return c.JSON(
+		return c.Status(400).JSON(
 			fiber.Map{"err": "Item is not an image!"},
 		)
 	}
 
 	if fileinfo.Size() > 8*1024*1024 {
-		return c.JSON(
+		return c.Status(400).JSON(
 			fiber.Map{"err": "Too large size!"},
 		)
 	}
 
-	return c.SendFile(path)
+	return c.Status(200).SendFile(path)
 }

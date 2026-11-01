@@ -32,6 +32,12 @@ func RawFile(c *fiber.Ctx) error {
 	scope := c.Locals("account").(types.Account).Scope
 	fullPath := fmt.Sprintf("%s%s", config.GetScopedFolder(scope), filepathParam)
 
+	if ok := utils.IsSafePathForScope(fullPath, scope); !ok {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "forbidden"},
+		)
+	}
+
 	if utils.IsNotExistingPath(fullPath) {
 		return c.Status(404).JSON(fiber.Map{"err": "File not found"})
 	}
