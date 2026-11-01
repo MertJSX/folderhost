@@ -30,9 +30,16 @@ func CheckAuth(c *fiber.Ctx) error {
 		body = make(map[string]interface{})
 	}
 
-	pathsToCheck := []string{"path", "folder", "itemName", "filepath", "oldFilepath", "newFilepath"}
-	for _, p := range pathsToCheck {
+	queriesToCheck := []string{"path", "folder", "itemName", "filepath", "oldFilepath", "newFilepath"}
+	for _, p := range queriesToCheck {
 		val := c.Query(p)
+		if val != "" && !utils.IsSafePath(val) {
+			return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
+		}
+	}
+	paramsToCheck := []string{"path", "folder", "itemName", "filepath", "oldFilepath", "newFilepath"}
+	for _, p := range paramsToCheck {
+		val := c.Params(p)
 		if val != "" && !utils.IsSafePath(val) {
 			return c.Status(403).JSON(fiber.Map{"err": "forbidden"})
 		}

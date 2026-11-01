@@ -30,13 +30,13 @@ func Delete(c *fiber.Ctx) error {
 	pathStat, err := os.Stat(path)
 
 	if os.IsNotExist(err) {
-		return c.JSON(
+		return c.Status(404).JSON(
 			fiber.Map{"err": "Wrong path!"},
 		)
 	}
 
 	if path == fmt.Sprintf("%s/", config.GetScopedFolder(scope)) {
-		return c.JSON(
+		return c.Status(403).JSON(
 			fiber.Map{"err": "You can't delete the main folder!"},
 		)
 	}

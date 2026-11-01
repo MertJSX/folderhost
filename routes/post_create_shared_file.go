@@ -9,6 +9,7 @@ import (
 	"github.com/MertJSX/folderhost/database/logs"
 	"github.com/MertJSX/folderhost/database/shared"
 	"github.com/MertJSX/folderhost/types"
+	"github.com/MertJSX/folderhost/utils"
 	"github.com/MertJSX/folderhost/utils/config"
 	"github.com/gofiber/fiber/v2"
 )
@@ -49,6 +50,12 @@ func PostCreateSharedFile(c *fiber.Ctx) error {
 		recordPath = "/" + recordPath
 	}
 	requestBody.Shared.Path = fmt.Sprintf("%s%s", config.Config.GetScopedFolder(account.Scope), recordPath)
+
+	if ok := utils.IsSafePathForScope(requestBody.Shared.Path, account.Scope); !ok {
+		return c.Status(403).JSON(
+			fiber.Map{"err": "forbidden"},
+		)
+	}
 
 	existingOrNew, err := shared.CreateShared(&requestBody.Shared)
 
