@@ -148,7 +148,7 @@ jobs:
     
     - name: Run Go tests
       run: |
-        make test
+        make test-server
 
     - name: Install dependencies
       run: make setup

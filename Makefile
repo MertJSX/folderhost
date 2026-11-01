@@ -8,7 +8,7 @@ docker: # Example: make docker VERSION=v26.5.0
 	VERSION=$(VERSION) docker compose build
 	VERSION=$(VERSION) docker compose up
 
-test:
+test-server:
 	go run gotest.tools/gotestsum@latest --format testname ./test/ -v -count=1
 
 # To run the tests on Fedora, you have to enable TESTCONTAINERS_RYUK_DISABLED
