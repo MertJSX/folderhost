@@ -104,6 +104,12 @@ rm -rf folderhost-linux-amd64.tar.gz
 
 ---
 
+## One-Click Deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/FolderHost/)
+
+---
+
 ## Documentation
 
 There is a simple documentation page that explains how to use FolderHost. You can access it from the website of the [FolderHost](https://folderhost.org). The program itself is so simple. There is basically nothing to explain. The configuration file has it's own comments describing what each field does. If you have any additional questions, you can open an issue or discussion on GitHub. I usually reply in a few hours but it might take a day or two depending on my schedule.
