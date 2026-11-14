@@ -280,11 +280,11 @@ The current license is [GPL-3.0 License](LICENSE). I like open-source things, so
 Built with ❤️ by [MertJSX](https://github.com/MertJSX)
 
 ### Contributors
-- cosark *(Github: https://github.com/cosark)*
-- HyunJoong KIM, independent security researcher *(Email: khjppow1@gmail.com)*
-- @hackchang *(Github: https://github.com/hackchang)*
-- Simeon / @simeonnv *(Github: https://github.com/simeonnv)*
-- Ömer Açıkgöz / @Omeracix *(Github: https://github.com/Omeracix)*
+- cosark *(Github: [@cosark](https://github.com/cosark))*
+- HyunJoong KIM *(Github: [@hjkim-secutest](https://github.com/hjkim-secutest))*
+- HackChang *(Github: [@hackchang](https://github.com/hackchang))*
+- Simeon *(Github: [@simeonnv](https://github.com/simeonnv))*
+- Ömer Açıkgöz *(Github: [@Omeracix](https://github.com/Omeracix))*
 
 ### Tech Stack:
 - Backend: Go
